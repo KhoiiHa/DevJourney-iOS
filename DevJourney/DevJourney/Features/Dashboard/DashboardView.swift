@@ -10,6 +10,7 @@ import SwiftUI
 
 struct DashboardView: View {
     @Query private var goals: [LearningGoal]
+    @Query private var projects: [PortfolioProject]
 
     private var openGoalsCount: Int {
         goals.filter { !$0.isCompleted }.count
@@ -17,6 +18,10 @@ struct DashboardView: View {
 
     private var completedGoalsCount: Int {
         goals.filter(\.isCompleted).count
+    }
+
+    private var projectsCount: Int {
+        projects.count
     }
 
     var body: some View {
@@ -42,14 +47,29 @@ struct DashboardView: View {
                         value: completedGoalsCount,
                         systemImage: "checkmark.circle.fill"
                     )
+
+                    DashboardMetricView(
+                        title: "Projekte",
+                        value: projectsCount,
+                        systemImage: "folder"
+                    )
                 }
 
-                NavigationLink {
-                    GoalsView()
-                } label: {
-                    Label("Lernziele öffnen", systemImage: "target")
+                VStack(alignment: .leading, spacing: 12) {
+                    NavigationLink {
+                        GoalsView()
+                    } label: {
+                        Label("Lernziele öffnen", systemImage: "target")
+                    }
+                    .buttonStyle(.borderedProminent)
+
+                    NavigationLink {
+                        ProjectsView()
+                    } label: {
+                        Label("Projekte öffnen", systemImage: "folder")
+                    }
+                    .buttonStyle(.bordered)
                 }
-                .buttonStyle(.borderedProminent)
 
                 Spacer()
             }
@@ -88,5 +108,5 @@ private struct DashboardMetricView: View {
 
 #Preview {
     DashboardView()
-        .modelContainer(for: LearningGoal.self, inMemory: true)
+        .modelContainer(for: [LearningGoal.self, PortfolioProject.self], inMemory: true)
 }
