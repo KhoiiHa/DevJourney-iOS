@@ -8,6 +8,16 @@
 import Foundation
 import SwiftData
 
+enum JobApplicationStatus {
+    static let open = "Offen"
+    static let applied = "Beworben"
+    static let interview = "Interview"
+    static let rejected = "Absage"
+    static let offer = "Angebot"
+
+    static let all = [open, applied, interview, rejected, offer]
+}
+
 @Model
 final class JobApplication {
     var companyName: String
@@ -19,7 +29,7 @@ final class JobApplication {
     init(
         companyName: String,
         positionTitle: String,
-        status: String = "Offen",
+        status: String = JobApplicationStatus.open,
         appliedAt: Date? = nil,
         createdAt: Date = Date()
     ) {

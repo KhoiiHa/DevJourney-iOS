@@ -10,7 +10,7 @@ import SwiftUI
 struct ApplicationDetailView: View {
     @Bindable var application: JobApplication
 
-    private let availableStatuses = ["Offen", "Beworben", "Interview", "Absage", "Angebot"]
+    private let availableStatuses = JobApplicationStatus.all
 
     var body: some View {
         Form {
@@ -63,7 +63,7 @@ struct ApplicationDetailView: View {
             application: JobApplication(
                 companyName: "Apple",
                 positionTitle: "iOS Developer",
-                status: "Beworben",
+                status: JobApplicationStatus.applied,
                 appliedAt: Date()
             )
         )

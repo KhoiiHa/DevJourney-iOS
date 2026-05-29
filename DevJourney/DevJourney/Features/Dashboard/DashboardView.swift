@@ -34,24 +34,13 @@ struct DashboardView: View {
         applications.count
     }
 
-    private var openApplicationsCount: Int {
-        applications.filter { $0.status == "Offen" }.count
-    }
-
-    private var interviewApplicationsCount: Int {
-        applications.filter { $0.status == "Interview" }.count
-    }
-
-    private var offerApplicationsCount: Int {
-        applications.filter { $0.status == "Angebot" }.count
-    }
-
     private var applicationStatusChartData: [DashboardChartValue] {
-        [
-            DashboardChartValue(title: "Offen", value: openApplicationsCount),
-            DashboardChartValue(title: "Interview", value: interviewApplicationsCount),
-            DashboardChartValue(title: "Angebot", value: offerApplicationsCount)
-        ]
+        JobApplicationStatus.all.map { status in
+            DashboardChartValue(
+                title: status,
+                value: applications.filter { $0.status == status }.count
+            )
+        }
     }
 
     var body: some View {
@@ -96,10 +85,13 @@ struct DashboardView: View {
                         Text("Bewerbungsstatus")
                             .font(.headline)
 
-                        HStack(spacing: 12) {
-                            DashboardStatusView(title: "Offen", value: openApplicationsCount)
-                            DashboardStatusView(title: "Interview", value: interviewApplicationsCount)
-                            DashboardStatusView(title: "Angebot", value: offerApplicationsCount)
+                        LazyVGrid(columns: metricColumns, spacing: 12) {
+                            ForEach(applicationStatusChartData) { statusValue in
+                                DashboardStatusView(
+                                    title: statusValue.title,
+                                    value: statusValue.value
+                                )
+                            }
                         }
                     }
 

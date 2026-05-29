@@ -13,10 +13,10 @@ import SwiftData
 final class ProjectsViewModel {
     var newProjectTitle = ""
     var newProjectSummary = ""
-    var newProjectStatus = "Geplant"
+    var newProjectStatus = PortfolioProjectStatus.planned
     var isShowingAddProject = false
 
-    let availableStatuses = ["Geplant", "In Arbeit", "Abgeschlossen"]
+    let availableStatuses = PortfolioProjectStatus.all
 
     var canAddProject: Bool {
         !trimmedTitle.isEmpty
@@ -53,7 +53,7 @@ final class ProjectsViewModel {
     private func resetForm() {
         newProjectTitle = ""
         newProjectSummary = ""
-        newProjectStatus = "Geplant"
+        newProjectStatus = PortfolioProjectStatus.planned
         isShowingAddProject = false
     }
 

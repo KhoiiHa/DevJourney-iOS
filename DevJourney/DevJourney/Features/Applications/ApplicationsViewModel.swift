@@ -13,12 +13,12 @@ import SwiftData
 final class ApplicationsViewModel {
     var companyName = ""
     var positionTitle = ""
-    var status = "Offen"
+    var status = JobApplicationStatus.open
     var hasAppliedDate = false
     var appliedAt = Date()
     var isShowingAddApplication = false
 
-    let availableStatuses = ["Offen", "Beworben", "Interview", "Absage", "Angebot"]
+    let availableStatuses = JobApplicationStatus.all
 
     var canAddApplication: Bool {
         !trimmedCompanyName.isEmpty && !trimmedPositionTitle.isEmpty
@@ -56,7 +56,7 @@ final class ApplicationsViewModel {
     private func resetForm() {
         companyName = ""
         positionTitle = ""
-        status = "Offen"
+        status = JobApplicationStatus.open
         hasAppliedDate = false
         appliedAt = Date()
         isShowingAddApplication = false

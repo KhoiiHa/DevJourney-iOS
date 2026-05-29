@@ -10,7 +10,7 @@ import SwiftUI
 struct ProjectDetailView: View {
     @Bindable var project: PortfolioProject
 
-    private let availableStatuses = ["Geplant", "In Arbeit", "Abgeschlossen"]
+    private let availableStatuses = PortfolioProjectStatus.all
 
     var body: some View {
         Form {
