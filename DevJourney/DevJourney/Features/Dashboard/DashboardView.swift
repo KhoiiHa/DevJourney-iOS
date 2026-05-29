@@ -33,6 +33,18 @@ struct DashboardView: View {
         applications.count
     }
 
+    private var openApplicationsCount: Int {
+        applications.filter { $0.status == "Offen" }.count
+    }
+
+    private var interviewApplicationsCount: Int {
+        applications.filter { $0.status == "Interview" }.count
+    }
+
+    private var offerApplicationsCount: Int {
+        applications.filter { $0.status == "Angebot" }.count
+    }
+
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 16) {
@@ -70,6 +82,17 @@ struct DashboardView: View {
                     )
                 }
 
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Bewerbungsstatus")
+                        .font(.headline)
+
+                    HStack(spacing: 12) {
+                        DashboardStatusView(title: "Offen", value: openApplicationsCount)
+                        DashboardStatusView(title: "Interview", value: interviewApplicationsCount)
+                        DashboardStatusView(title: "Angebot", value: offerApplicationsCount)
+                    }
+                }
+
                 VStack(alignment: .leading, spacing: 12) {
                     NavigationLink {
                         GoalsView()
@@ -99,6 +122,26 @@ struct DashboardView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .navigationTitle("Dashboard")
         }
+    }
+}
+
+private struct DashboardStatusView: View {
+    let title: String
+    let value: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("\(value)")
+                .font(.headline)
+
+            Text(title)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(12)
+        .background(.thinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
 
