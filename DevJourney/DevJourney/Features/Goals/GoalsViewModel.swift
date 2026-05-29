@@ -42,6 +42,10 @@ final class GoalsViewModel {
         }
     }
 
+    func toggleCompletion(for goal: LearningGoal) {
+        goal.isCompleted.toggle()
+    }
+
     private func resetForm() {
         newGoalTitle = ""
         isShowingAddGoal = false

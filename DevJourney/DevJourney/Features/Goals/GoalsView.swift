@@ -23,13 +23,26 @@ struct GoalsView: View {
                 )
             } else {
                 ForEach(goals) { goal in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(goal.title)
-                            .font(.headline)
+                    HStack(spacing: 12) {
+                        Button {
+                            viewModel.toggleCompletion(for: goal)
+                        } label: {
+                            Image(systemName: goal.isCompleted ? "checkmark.circle.fill" : "circle")
+                                .font(.title3)
+                                .foregroundStyle(goal.isCompleted ? .green : .secondary)
+                        }
+                        .buttonStyle(.plain)
 
-                        Text(goal.createdAt, style: .date)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(goal.title)
+                                .font(.headline)
+                                .strikethrough(goal.isCompleted)
+                                .foregroundStyle(goal.isCompleted ? .secondary : .primary)
+
+                            Text(goal.isCompleted ? "Erledigt" : "Offen")
+                                .font(.caption)
+                                .foregroundStyle(goal.isCompleted ? .green : .secondary)
+                        }
                     }
                     .padding(.vertical, 4)
                 }
