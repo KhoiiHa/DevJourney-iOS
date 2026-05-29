@@ -13,6 +13,7 @@ import SwiftData
 final class ProjectsViewModel {
     var newProjectTitle = ""
     var newProjectSummary = ""
+    var newProjectGitHubURL = ""
     var newProjectStatus = PortfolioProjectStatus.planned
     var isShowingAddProject = false
 
@@ -38,6 +39,7 @@ final class ProjectsViewModel {
         let project = PortfolioProject(
             title: trimmedTitle,
             summary: trimmedSummary,
+            githubURL: trimmedGitHubURL,
             status: newProjectStatus
         )
         modelContext.insert(project)
@@ -53,6 +55,7 @@ final class ProjectsViewModel {
     private func resetForm() {
         newProjectTitle = ""
         newProjectSummary = ""
+        newProjectGitHubURL = ""
         newProjectStatus = PortfolioProjectStatus.planned
         isShowingAddProject = false
     }
@@ -63,5 +66,9 @@ final class ProjectsViewModel {
 
     private var trimmedSummary: String {
         newProjectSummary.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var trimmedGitHubURL: String {
+        newProjectGitHubURL.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

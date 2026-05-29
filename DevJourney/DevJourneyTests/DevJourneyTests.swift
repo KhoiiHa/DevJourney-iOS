@@ -6,6 +6,7 @@
 //
 
 import Testing
+import SwiftData
 @testable import DevJourney
 
 struct DevJourneyTests {
@@ -27,8 +28,25 @@ struct DevJourneyTests {
         #expect(viewModel.newProjectStatus == PortfolioProjectStatus.planned)
 
         viewModel.newProjectTitle = "DevJourney"
+        viewModel.newProjectGitHubURL = " https://github.com/example/devjourney "
 
         #expect(viewModel.canAddProject == true)
+    }
+
+    @MainActor
+    @Test func projectGitHubURLIsTrimmedWhenAdded() throws {
+        let container = try ModelContainer(
+            for: PortfolioProject.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let viewModel = ProjectsViewModel()
+        viewModel.newProjectTitle = "DevJourney"
+        viewModel.newProjectGitHubURL = " https://github.com/example/devjourney "
+
+        viewModel.addProject(using: container.mainContext)
+
+        let projects = try container.mainContext.fetch(FetchDescriptor<PortfolioProject>())
+        #expect(projects.first?.githubURL == "https://github.com/example/devjourney")
     }
 
     @Test func applicationUsesDefaultStatusAndRequiresCompanyAndPosition() {

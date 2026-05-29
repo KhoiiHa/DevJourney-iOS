@@ -36,6 +36,12 @@ struct ProjectsView: View {
                                     .foregroundStyle(.secondary)
                             }
 
+                            if !project.githubURL.isEmpty {
+                                Label("GitHub", systemImage: "link")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
                             Text(project.status)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
@@ -68,6 +74,10 @@ struct ProjectsView: View {
 
                         TextField("Kurzbeschreibung", text: $viewModel.newProjectSummary, axis: .vertical)
                             .lineLimit(2...5)
+
+                        TextField("GitHub-Link", text: $viewModel.newProjectGitHubURL)
+                            .textInputAutocapitalization(.never)
+                            .keyboardType(.URL)
                     }
 
                     Section("Status") {

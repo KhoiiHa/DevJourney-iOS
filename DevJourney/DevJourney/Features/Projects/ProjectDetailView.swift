@@ -19,6 +19,10 @@ struct ProjectDetailView: View {
 
                 TextField("Kurzbeschreibung", text: $project.summary, axis: .vertical)
                     .lineLimit(2...6)
+
+                TextField("GitHub-Link", text: $project.githubURL)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.URL)
             }
 
             Section("Status") {
