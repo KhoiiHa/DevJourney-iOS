@@ -23,19 +23,23 @@ struct ProjectsView: View {
                 )
             } else {
                 ForEach(projects) { project in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(project.title)
-                            .font(.headline)
+                    NavigationLink {
+                        ProjectDetailView(project: project)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(project.title)
+                                .font(.headline)
 
-                        if !project.summary.isEmpty {
-                            Text(project.summary)
-                                .font(.subheadline)
+                            if !project.summary.isEmpty {
+                                Text(project.summary)
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            Text(project.status)
+                                .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
-
-                        Text(project.status)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 4)
                 }
