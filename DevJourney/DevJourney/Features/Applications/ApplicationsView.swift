@@ -23,25 +23,29 @@ struct ApplicationsView: View {
                 )
             } else {
                 ForEach(applications) { application in
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(application.positionTitle)
-                            .font(.headline)
+                    NavigationLink {
+                        ApplicationDetailView(application: application)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(application.positionTitle)
+                                .font(.headline)
 
-                        Text(application.companyName)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
+                            Text(application.companyName)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
 
-                        HStack(spacing: 8) {
-                            Text(application.status)
+                            HStack(spacing: 8) {
+                                Text(application.status)
 
-                            if let appliedAt = application.appliedAt {
-                                Text("Seit \(appliedAt, style: .date)")
+                                if let appliedAt = application.appliedAt {
+                                    Text("Seit \(appliedAt, style: .date)")
+                                }
                             }
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                         }
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
                 }
                 .onDelete { offsets in
                     viewModel.deleteApplications(at: offsets, from: applications, using: modelContext)
