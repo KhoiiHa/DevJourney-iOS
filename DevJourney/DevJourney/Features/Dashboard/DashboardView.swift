@@ -5,6 +5,7 @@
 //  Created by Vu Minh Khoi Ha on 29.05.26.
 //
 
+import Charts
 import SwiftData
 import SwiftUI
 
@@ -45,83 +46,134 @@ struct DashboardView: View {
         applications.filter { $0.status == "Angebot" }.count
     }
 
+    private var applicationStatusChartData: [DashboardChartValue] {
+        [
+            DashboardChartValue(title: "Offen", value: openApplicationsCount),
+            DashboardChartValue(title: "Interview", value: interviewApplicationsCount),
+            DashboardChartValue(title: "Angebot", value: offerApplicationsCount)
+        ]
+    }
+
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("DevJourney")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("DevJourney")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
 
-                Text("Lernziele, Portfolio-Projekte und Bewerbungen an einem Ort.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
+                    Text("Lernziele, Portfolio-Projekte und Bewerbungen an einem Ort.")
+                        .font(.body)
+                        .foregroundStyle(.secondary)
 
-                LazyVGrid(columns: metricColumns, spacing: 12) {
-                    DashboardMetricView(
-                        title: "Offen",
-                        value: openGoalsCount,
-                        systemImage: "circle"
-                    )
+                    LazyVGrid(columns: metricColumns, spacing: 12) {
+                        DashboardMetricView(
+                            title: "Offen",
+                            value: openGoalsCount,
+                            systemImage: "circle"
+                        )
 
-                    DashboardMetricView(
-                        title: "Erledigt",
-                        value: completedGoalsCount,
-                        systemImage: "checkmark.circle.fill"
-                    )
+                        DashboardMetricView(
+                            title: "Erledigt",
+                            value: completedGoalsCount,
+                            systemImage: "checkmark.circle.fill"
+                        )
 
-                    DashboardMetricView(
-                        title: "Projekte",
-                        value: projectsCount,
-                        systemImage: "folder"
-                    )
+                        DashboardMetricView(
+                            title: "Projekte",
+                            value: projectsCount,
+                            systemImage: "folder"
+                        )
 
-                    DashboardMetricView(
-                        title: "Bewerbungen",
-                        value: applicationsCount,
-                        systemImage: "briefcase"
-                    )
-                }
+                        DashboardMetricView(
+                            title: "Bewerbungen",
+                            value: applicationsCount,
+                            systemImage: "briefcase"
+                        )
+                    }
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Bewerbungsstatus")
-                        .font(.headline)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Bewerbungsstatus")
+                            .font(.headline)
 
-                    HStack(spacing: 12) {
-                        DashboardStatusView(title: "Offen", value: openApplicationsCount)
-                        DashboardStatusView(title: "Interview", value: interviewApplicationsCount)
-                        DashboardStatusView(title: "Angebot", value: offerApplicationsCount)
+                        HStack(spacing: 12) {
+                            DashboardStatusView(title: "Offen", value: openApplicationsCount)
+                            DashboardStatusView(title: "Interview", value: interviewApplicationsCount)
+                            DashboardStatusView(title: "Angebot", value: offerApplicationsCount)
+                        }
+                    }
+
+                    if applicationsCount > 0 {
+                        DashboardBarChartView(
+                            title: "Bewerbungen nach Status",
+                            values: applicationStatusChartData
+                        )
+                    }
+
+                    VStack(alignment: .leading, spacing: 12) {
+                        NavigationLink {
+                            GoalsView()
+                        } label: {
+                            Label("Lernziele öffnen", systemImage: "target")
+                        }
+                        .buttonStyle(.borderedProminent)
+
+                        NavigationLink {
+                            ProjectsView()
+                        } label: {
+                            Label("Projekte öffnen", systemImage: "folder")
+                        }
+                        .buttonStyle(.bordered)
+
+                        NavigationLink {
+                            ApplicationsView()
+                        } label: {
+                            Label("Bewerbungen öffnen", systemImage: "briefcase")
+                        }
+                        .buttonStyle(.bordered)
                     }
                 }
-
-                VStack(alignment: .leading, spacing: 12) {
-                    NavigationLink {
-                        GoalsView()
-                    } label: {
-                        Label("Lernziele öffnen", systemImage: "target")
-                    }
-                    .buttonStyle(.borderedProminent)
-
-                    NavigationLink {
-                        ProjectsView()
-                    } label: {
-                        Label("Projekte öffnen", systemImage: "folder")
-                    }
-                    .buttonStyle(.bordered)
-
-                    NavigationLink {
-                        ApplicationsView()
-                    } label: {
-                        Label("Bewerbungen öffnen", systemImage: "briefcase")
-                    }
-                    .buttonStyle(.bordered)
-                }
-
-                Spacer()
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
             .navigationTitle("Dashboard")
         }
+    }
+}
+
+private struct DashboardChartValue: Identifiable {
+    let title: String
+    let value: Int
+
+    var id: String {
+        title
+    }
+}
+
+private struct DashboardBarChartView: View {
+    let title: String
+    let values: [DashboardChartValue]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.headline)
+
+            Chart(values) { value in
+                BarMark(
+                    x: .value("Status", value.title),
+                    y: .value("Anzahl", value.value)
+                )
+                .foregroundStyle(.blue)
+            }
+            .frame(height: 180)
+            .chartYAxis {
+                AxisMarks(position: .leading)
+            }
+        }
+        .padding()
+        .background(.thinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 8))
     }
 }
 
