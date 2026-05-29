@@ -45,6 +45,12 @@ struct GoalsView: View {
                                 Text(goal.isCompleted ? "Erledigt" : "Offen")
                                     .font(.caption)
                                     .foregroundStyle(goal.isCompleted ? .green : .secondary)
+
+                                if let targetDate = goal.targetDate {
+                                    Text("Ziel: \(targetDate, style: .date)")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                     }
