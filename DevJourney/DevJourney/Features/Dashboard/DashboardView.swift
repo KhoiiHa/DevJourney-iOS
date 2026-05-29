@@ -57,13 +57,13 @@ struct DashboardView: View {
 
                     LazyVGrid(columns: metricColumns, spacing: 12) {
                         DashboardMetricView(
-                            title: "Offen",
+                            title: "Offene Ziele",
                             value: openGoalsCount,
                             systemImage: "circle"
                         )
 
                         DashboardMetricView(
-                            title: "Erledigt",
+                            title: "Erledigte Ziele",
                             value: completedGoalsCount,
                             systemImage: "checkmark.circle.fill"
                         )
@@ -102,33 +102,56 @@ struct DashboardView: View {
                         )
                     }
 
-                    VStack(alignment: .leading, spacing: 12) {
-                        NavigationLink {
-                            GoalsView()
-                        } label: {
-                            Label("Lernziele öffnen", systemImage: "target")
-                        }
-                        .buttonStyle(.borderedProminent)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Schnellzugriff")
+                            .font(.headline)
 
-                        NavigationLink {
-                            ProjectsView()
-                        } label: {
-                            Label("Projekte öffnen", systemImage: "folder")
-                        }
-                        .buttonStyle(.bordered)
+                        VStack(spacing: 10) {
+                            DashboardNavigationLink(
+                                title: "Lernziele öffnen",
+                                systemImage: "target"
+                            ) {
+                                GoalsView()
+                            }
+                            .buttonStyle(.borderedProminent)
 
-                        NavigationLink {
-                            ApplicationsView()
-                        } label: {
-                            Label("Bewerbungen öffnen", systemImage: "briefcase")
+                            DashboardNavigationLink(
+                                title: "Projekte öffnen",
+                                systemImage: "folder"
+                            ) {
+                                ProjectsView()
+                            }
+                            .buttonStyle(.bordered)
+
+                            DashboardNavigationLink(
+                                title: "Bewerbungen öffnen",
+                                systemImage: "briefcase"
+                            ) {
+                                ApplicationsView()
+                            }
+                            .buttonStyle(.bordered)
                         }
-                        .buttonStyle(.bordered)
                     }
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .navigationTitle("Dashboard")
+        }
+    }
+}
+
+private struct DashboardNavigationLink<Destination: View>: View {
+    let title: String
+    let systemImage: String
+    let destination: () -> Destination
+
+    var body: some View {
+        NavigationLink {
+            destination()
+        } label: {
+            Label(title, systemImage: systemImage)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }
