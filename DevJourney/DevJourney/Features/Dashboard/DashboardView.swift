@@ -5,6 +5,7 @@
 //  Created by Vu Minh Khoi Ha on 29.05.26.
 //
 
+import SwiftData
 import SwiftUI
 
 struct DashboardView: View {
@@ -19,6 +20,13 @@ struct DashboardView: View {
                     .font(.body)
                     .foregroundStyle(.secondary)
 
+                NavigationLink {
+                    GoalsView()
+                } label: {
+                    Label("Lernziele öffnen", systemImage: "target")
+                }
+                .buttonStyle(.borderedProminent)
+
                 Spacer()
             }
             .padding()
@@ -30,4 +38,5 @@ struct DashboardView: View {
 
 #Preview {
     DashboardView()
+        .modelContainer(for: LearningGoal.self, inMemory: true)
 }
