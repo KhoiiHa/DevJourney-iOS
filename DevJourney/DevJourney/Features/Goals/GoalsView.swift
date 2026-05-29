@@ -13,6 +13,14 @@ struct GoalsView: View {
     @Query(sort: \LearningGoal.createdAt, order: .reverse) private var goals: [LearningGoal]
     @State private var viewModel = GoalsViewModel()
 
+    private var openGoals: [LearningGoal] {
+        goals.filter { !$0.isCompleted }
+    }
+
+    private var completedGoals: [LearningGoal] {
+        goals.filter(\.isCompleted)
+    }
+
     var body: some View {
         List {
             if goals.isEmpty {
@@ -22,42 +30,26 @@ struct GoalsView: View {
                     description: Text("Lege dein erstes Lernziel an, um deinen Fortschritt sichtbar zu machen.")
                 )
             } else {
-                ForEach(goals) { goal in
-                    HStack(spacing: 12) {
-                        Button {
-                            viewModel.toggleCompletion(for: goal)
-                        } label: {
-                            Image(systemName: goal.isCompleted ? "checkmark.circle.fill" : "circle")
-                                .font(.title3)
-                                .foregroundStyle(goal.isCompleted ? .green : .secondary)
+                if !openGoals.isEmpty {
+                    Section("Offen") {
+                        ForEach(openGoals) { goal in
+                            goalRow(for: goal)
                         }
-                        .buttonStyle(.plain)
-
-                        NavigationLink {
-                            GoalDetailView(goal: goal)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(goal.title)
-                                    .font(.headline)
-                                    .strikethrough(goal.isCompleted)
-                                    .foregroundStyle(goal.isCompleted ? .secondary : .primary)
-
-                                Text(goal.isCompleted ? "Erledigt" : "Offen")
-                                    .font(.caption)
-                                    .foregroundStyle(goal.isCompleted ? .green : .secondary)
-
-                                if let targetDate = goal.targetDate {
-                                    Text("Ziel: \(targetDate, style: .date)")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
+                        .onDelete { offsets in
+                            viewModel.deleteGoals(at: offsets, from: openGoals, using: modelContext)
                         }
                     }
-                    .padding(.vertical, 4)
                 }
-                .onDelete { offsets in
-                    viewModel.deleteGoals(at: offsets, from: goals, using: modelContext)
+
+                if !completedGoals.isEmpty {
+                    Section("Erledigt") {
+                        ForEach(completedGoals) { goal in
+                            goalRow(for: goal)
+                        }
+                        .onDelete { offsets in
+                            viewModel.deleteGoals(at: offsets, from: completedGoals, using: modelContext)
+                        }
+                    }
                 }
             }
         }
@@ -95,6 +87,41 @@ struct GoalsView: View {
                 }
             }
         }
+    }
+
+    private func goalRow(for goal: LearningGoal) -> some View {
+        HStack(spacing: 12) {
+            Button {
+                viewModel.toggleCompletion(for: goal)
+            } label: {
+                Image(systemName: goal.isCompleted ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(goal.isCompleted ? .green : .secondary)
+            }
+            .buttonStyle(.plain)
+
+            NavigationLink {
+                GoalDetailView(goal: goal)
+            } label: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(goal.title)
+                        .font(.headline)
+                        .strikethrough(goal.isCompleted)
+                        .foregroundStyle(goal.isCompleted ? .secondary : .primary)
+
+                    Text(goal.isCompleted ? "Erledigt" : "Offen")
+                        .font(.caption)
+                        .foregroundStyle(goal.isCompleted ? .green : .secondary)
+
+                    if let targetDate = goal.targetDate {
+                        Text("Ziel: \(targetDate, style: .date)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 
