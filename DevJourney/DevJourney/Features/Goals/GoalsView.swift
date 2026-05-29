@@ -33,15 +33,19 @@ struct GoalsView: View {
                         }
                         .buttonStyle(.plain)
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(goal.title)
-                                .font(.headline)
-                                .strikethrough(goal.isCompleted)
-                                .foregroundStyle(goal.isCompleted ? .secondary : .primary)
+                        NavigationLink {
+                            GoalDetailView(goal: goal)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(goal.title)
+                                    .font(.headline)
+                                    .strikethrough(goal.isCompleted)
+                                    .foregroundStyle(goal.isCompleted ? .secondary : .primary)
 
-                            Text(goal.isCompleted ? "Erledigt" : "Offen")
-                                .font(.caption)
-                                .foregroundStyle(goal.isCompleted ? .green : .secondary)
+                                Text(goal.isCompleted ? "Erledigt" : "Offen")
+                                    .font(.caption)
+                                    .foregroundStyle(goal.isCompleted ? .green : .secondary)
+                            }
                         }
                     }
                     .padding(.vertical, 4)
