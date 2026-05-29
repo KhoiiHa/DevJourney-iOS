@@ -11,6 +11,11 @@ import SwiftUI
 struct DashboardView: View {
     @Query private var goals: [LearningGoal]
     @Query private var projects: [PortfolioProject]
+    @Query private var applications: [JobApplication]
+
+    private let metricColumns = [
+        GridItem(.adaptive(minimum: 120), spacing: 12)
+    ]
 
     private var openGoalsCount: Int {
         goals.filter { !$0.isCompleted }.count
@@ -24,6 +29,10 @@ struct DashboardView: View {
         projects.count
     }
 
+    private var applicationsCount: Int {
+        applications.count
+    }
+
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 16) {
@@ -35,7 +44,7 @@ struct DashboardView: View {
                     .font(.body)
                     .foregroundStyle(.secondary)
 
-                HStack(spacing: 12) {
+                LazyVGrid(columns: metricColumns, spacing: 12) {
                     DashboardMetricView(
                         title: "Offen",
                         value: openGoalsCount,
@@ -53,6 +62,12 @@ struct DashboardView: View {
                         value: projectsCount,
                         systemImage: "folder"
                     )
+
+                    DashboardMetricView(
+                        title: "Bewerbungen",
+                        value: applicationsCount,
+                        systemImage: "briefcase"
+                    )
                 }
 
                 VStack(alignment: .leading, spacing: 12) {
@@ -67,6 +82,13 @@ struct DashboardView: View {
                         ProjectsView()
                     } label: {
                         Label("Projekte öffnen", systemImage: "folder")
+                    }
+                    .buttonStyle(.bordered)
+
+                    NavigationLink {
+                        ApplicationsView()
+                    } label: {
+                        Label("Bewerbungen öffnen", systemImage: "briefcase")
                     }
                     .buttonStyle(.bordered)
                 }
@@ -108,5 +130,5 @@ private struct DashboardMetricView: View {
 
 #Preview {
     DashboardView()
-        .modelContainer(for: [LearningGoal.self, PortfolioProject.self], inMemory: true)
+        .modelContainer(for: [LearningGoal.self, PortfolioProject.self, JobApplication.self], inMemory: true)
 }
