@@ -22,33 +22,23 @@ struct ApplicationsView: View {
                     description: Text("Lege deine erste Bewerbung an, um deinen Prozess zu verfolgen.")
                 )
             } else {
-                ForEach(applications) { application in
-                    NavigationLink {
-                        ApplicationDetailView(application: application)
-                    } label: {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(application.positionTitle)
-                                .font(.headline)
+                ForEach(viewModel.availableStatuses, id: \.self) { status in
+                    let applicationsForStatus = applications.filter { $0.status == status }
 
-                            Text(application.companyName)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-
-                            HStack(spacing: 8) {
-                                Text(application.status)
-
-                                if let appliedAt = application.appliedAt {
-                                    Text("Seit \(appliedAt, style: .date)")
-                                }
+                    if !applicationsForStatus.isEmpty {
+                        Section(status) {
+                            ForEach(applicationsForStatus) { application in
+                                applicationRow(for: application)
                             }
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .onDelete { offsets in
+                                viewModel.deleteApplications(
+                                    at: offsets,
+                                    from: applicationsForStatus,
+                                    using: modelContext
+                                )
+                            }
                         }
-                        .padding(.vertical, 4)
                     }
-                }
-                .onDelete { offsets in
-                    viewModel.deleteApplications(at: offsets, from: applications, using: modelContext)
                 }
             }
         }
@@ -108,6 +98,28 @@ struct ApplicationsView: View {
                     }
                 }
             }
+        }
+    }
+
+    private func applicationRow(for application: JobApplication) -> some View {
+        NavigationLink {
+            ApplicationDetailView(application: application)
+        } label: {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(application.positionTitle)
+                    .font(.headline)
+
+                Text(application.companyName)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+
+                if let appliedAt = application.appliedAt {
+                    Text("Seit \(appliedAt, style: .date)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.vertical, 4)
         }
     }
 }
