@@ -16,11 +16,16 @@ struct ApplicationsView: View {
     var body: some View {
         List {
             if applications.isEmpty {
-                ContentUnavailableView(
-                    "Noch keine Bewerbungen",
-                    systemImage: "briefcase",
-                    description: Text("Lege deine erste Bewerbung an, um deinen Prozess zu verfolgen.")
-                )
+                ContentUnavailableView {
+                    Label("Noch keine Bewerbungen", systemImage: "briefcase")
+                } description: {
+                    Text("Lege deine erste Bewerbung an, um deinen Prozess zu verfolgen.")
+                } actions: {
+                    Button("Erste Bewerbung erfassen") {
+                        viewModel.startAddingApplication()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
             } else {
                 ForEach(viewModel.availableStatuses, id: \.self) { status in
                     let applicationsForStatus = applications.filter { $0.status == status }

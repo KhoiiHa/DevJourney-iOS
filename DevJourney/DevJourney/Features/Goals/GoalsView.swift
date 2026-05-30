@@ -24,11 +24,16 @@ struct GoalsView: View {
     var body: some View {
         List {
             if goals.isEmpty {
-                ContentUnavailableView(
-                    "Noch keine Lernziele",
-                    systemImage: "target",
-                    description: Text("Lege dein erstes Lernziel an, um deinen Fortschritt sichtbar zu machen.")
-                )
+                ContentUnavailableView {
+                    Label("Noch keine Lernziele", systemImage: "target")
+                } description: {
+                    Text("Lege dein erstes Lernziel an, um deinen Fortschritt sichtbar zu machen.")
+                } actions: {
+                    Button("Erstes Lernziel erfassen") {
+                        viewModel.startAddingGoal()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
             } else {
                 if !openGoals.isEmpty {
                     Section("Offen") {

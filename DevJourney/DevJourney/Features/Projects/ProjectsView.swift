@@ -16,11 +16,16 @@ struct ProjectsView: View {
     var body: some View {
         List {
             if projects.isEmpty {
-                ContentUnavailableView(
-                    "Noch keine Portfolio-Projekte",
-                    systemImage: "folder",
-                    description: Text("Lege dein erstes Projekt an, um deine Arbeit sichtbar zu machen.")
-                )
+                ContentUnavailableView {
+                    Label("Noch keine Portfolio-Projekte", systemImage: "folder")
+                } description: {
+                    Text("Lege dein erstes Projekt an, um deine Arbeit sichtbar zu machen.")
+                } actions: {
+                    Button("Erstes Projekt erfassen") {
+                        viewModel.startAddingProject()
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
             } else {
                 ForEach(projects) { project in
                     NavigationLink {
