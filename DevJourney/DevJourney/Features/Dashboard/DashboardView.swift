@@ -46,9 +46,9 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 14) {
                     Text("DevJourney")
-                        .font(.largeTitle)
+                        .font(.title)
                         .fontWeight(.bold)
 
                     Text("Lernziele, Portfolio-Projekte und Bewerbungen an einem Ort.")
@@ -82,6 +82,34 @@ struct DashboardView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
+                        Text("Schnellzugriff")
+                            .font(.headline)
+
+                        VStack(spacing: 8) {
+                            DashboardNavigationLink(
+                                title: "Lernziele öffnen",
+                                systemImage: "target"
+                            ) {
+                                GoalsView()
+                            }
+
+                            DashboardNavigationLink(
+                                title: "Projekte öffnen",
+                                systemImage: "folder"
+                            ) {
+                                ProjectsView()
+                            }
+
+                            DashboardNavigationLink(
+                                title: "Bewerbungen öffnen",
+                                systemImage: "briefcase"
+                            ) {
+                                ApplicationsView()
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
                         Text("Bewerbungsstatus")
                             .font(.headline)
 
@@ -101,42 +129,12 @@ struct DashboardView: View {
                             values: applicationStatusChartData
                         )
                     }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Schnellzugriff")
-                            .font(.headline)
-
-                        VStack(spacing: 10) {
-                            DashboardNavigationLink(
-                                title: "Lernziele öffnen",
-                                systemImage: "target"
-                            ) {
-                                GoalsView()
-                            }
-                            .buttonStyle(.borderedProminent)
-
-                            DashboardNavigationLink(
-                                title: "Projekte öffnen",
-                                systemImage: "folder"
-                            ) {
-                                ProjectsView()
-                            }
-                            .buttonStyle(.bordered)
-
-                            DashboardNavigationLink(
-                                title: "Bewerbungen öffnen",
-                                systemImage: "briefcase"
-                            ) {
-                                ApplicationsView()
-                            }
-                            .buttonStyle(.bordered)
-                        }
-                    }
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .navigationTitle("Dashboard")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
@@ -150,9 +148,21 @@ private struct DashboardNavigationLink<Destination: View>: View {
         NavigationLink {
             destination()
         } label: {
-            Label(title, systemImage: systemImage)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(spacing: 12) {
+                Label(title, systemImage: systemImage)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .font(.body)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(.thinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
         }
+        .buttonStyle(.plain)
     }
 }
 
@@ -181,12 +191,12 @@ private struct DashboardBarChartView: View {
                 )
                 .foregroundStyle(.blue)
             }
-            .frame(height: 180)
+            .frame(height: 150)
             .chartYAxis {
                 AxisMarks(position: .leading)
             }
         }
-        .padding()
+        .padding(14)
         .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
@@ -206,7 +216,8 @@ private struct DashboardStatusView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 10)
         .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
@@ -218,13 +229,13 @@ private struct DashboardMetricView: View {
     let systemImage: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             Image(systemName: systemImage)
                 .font(.title3)
                 .foregroundStyle(.secondary)
 
             Text("\(value)")
-                .font(.title2)
+                .font(.title3)
                 .fontWeight(.semibold)
 
             Text(title)
@@ -232,7 +243,7 @@ private struct DashboardMetricView: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
+        .padding(12)
         .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
