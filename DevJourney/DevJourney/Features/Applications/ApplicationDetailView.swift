@@ -8,56 +8,54 @@
 import SwiftUI
 
 struct ApplicationDetailView: View {
-    @Bindable var application: JobApplication
+    let application: JobApplication
+    @State private var viewModel: ApplicationDetailViewModel
 
-    private let availableStatuses = JobApplicationStatus.all
+    init(application: JobApplication) {
+        self.application = application
+        _viewModel = State(initialValue: ApplicationDetailViewModel(application: application))
+    }
 
     var body: some View {
         Form {
             Section("Bewerbung") {
-                TextField("Firma", text: $application.companyName)
-                TextField("Position", text: $application.positionTitle)
+                TextField("Firma", text: $viewModel.companyName)
+                TextField("Position", text: $viewModel.positionTitle)
 
-                TextField("Stellenanzeige-Link", text: $application.jobURL)
+                TextField("Stellenanzeige-Link", text: $viewModel.jobURL)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
             }
 
             Section("Status") {
-                Picker("Status", selection: $application.status) {
-                    ForEach(availableStatuses, id: \.self) { status in
+                Picker("Status", selection: $viewModel.status) {
+                    ForEach(viewModel.availableStatuses, id: \.self) { status in
                         Text(status)
                     }
                 }
             }
 
             Section("Bewerbungsdatum") {
-                if application.appliedAt == nil {
-                    Button("Datum setzen") {
-                        application.appliedAt = Date()
-                    }
-                } else {
+                Toggle("Datum setzen", isOn: $viewModel.hasAppliedDate)
+
+                if viewModel.hasAppliedDate {
                     DatePicker(
                         "Datum",
-                        selection: appliedAtBinding,
+                        selection: $viewModel.appliedAt,
                         displayedComponents: .date
                     )
-
-                    Button("Datum entfernen", role: .destructive) {
-                        application.appliedAt = nil
-                    }
                 }
             }
         }
         .navigationTitle("Bewerbung")
         .navigationBarTitleDisplayMode(.inline)
-    }
-
-    private var appliedAtBinding: Binding<Date> {
-        Binding {
-            application.appliedAt ?? Date()
-        } set: { newValue in
-            application.appliedAt = newValue
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Speichern") {
+                    viewModel.save(to: application)
+                }
+                .disabled(!viewModel.canSave)
+            }
         }
     }
 }
