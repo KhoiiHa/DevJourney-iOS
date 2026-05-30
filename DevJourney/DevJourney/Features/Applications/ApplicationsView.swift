@@ -42,7 +42,9 @@ struct ApplicationsView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Bewerbungen")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -83,6 +85,7 @@ struct ApplicationsView: View {
                     }
                 }
                 .navigationTitle("Neue Bewerbung")
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Abbrechen") {
@@ -119,7 +122,7 @@ struct ApplicationsView: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            .padding(.vertical, 4)
+            .padding(.vertical, 2)
         }
     }
 }

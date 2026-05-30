@@ -53,7 +53,9 @@ struct GoalsView: View {
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Lernziele")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -71,6 +73,7 @@ struct GoalsView: View {
                     TextField("Titel", text: $viewModel.newGoalTitle)
                 }
                 .navigationTitle("Neues Lernziel")
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Abbrechen") {
@@ -121,7 +124,7 @@ struct GoalsView: View {
                 }
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 }
 

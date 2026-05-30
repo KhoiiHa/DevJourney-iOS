@@ -34,6 +34,7 @@ struct ProjectDetailView: View {
             }
         }
         .navigationTitle("Projekt")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

@@ -47,14 +47,16 @@ struct ProjectsView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
-                    .padding(.vertical, 4)
+                    .padding(.vertical, 2)
                 }
                 .onDelete { offsets in
                     viewModel.deleteProjects(at: offsets, from: projects, using: modelContext)
                 }
             }
         }
+        .listStyle(.insetGrouped)
         .navigationTitle("Projekte")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -89,6 +91,7 @@ struct ProjectsView: View {
                     }
                 }
                 .navigationTitle("Neues Projekt")
+                .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Abbrechen") {

@@ -36,6 +36,7 @@ struct GoalDetailView: View {
             }
         }
         .navigationTitle("Details")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private var hasTargetDate: Binding<Bool> {

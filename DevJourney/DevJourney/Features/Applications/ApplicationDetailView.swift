@@ -46,6 +46,7 @@ struct ApplicationDetailView: View {
             }
         }
         .navigationTitle("Bewerbung")
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     private var appliedAtBinding: Binding<Date> {
