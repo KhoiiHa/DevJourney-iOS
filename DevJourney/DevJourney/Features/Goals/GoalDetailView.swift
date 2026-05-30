@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct GoalDetailView: View {
+    @Environment(\.dismiss) private var dismiss
+
     let goal: LearningGoal
     @State private var viewModel: GoalDetailViewModel
 
@@ -47,6 +49,7 @@ struct GoalDetailView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Speichern") {
                     viewModel.save(to: goal)
+                    dismiss()
                 }
                 .disabled(!viewModel.canSave)
             }

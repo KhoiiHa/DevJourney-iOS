@@ -36,13 +36,13 @@ struct ProjectsView: View {
                                     .foregroundStyle(.secondary)
                             }
 
-                            if !project.githubURL.isEmpty {
-                                Label("GitHub", systemImage: "link")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
+                            HStack(spacing: 6) {
+                                Text(project.status)
 
-                            Text(project.status)
+                                if !project.githubURL.isEmpty {
+                                    Text("GitHub-Link vorhanden")
+                                }
+                            }
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }

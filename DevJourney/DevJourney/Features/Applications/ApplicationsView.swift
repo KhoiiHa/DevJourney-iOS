@@ -88,7 +88,7 @@ struct ApplicationsView: View {
                         }
                     }
                 }
-                .navigationTitle("Neue Bewerbung")
+                .navigationTitle("Bewerbung")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
@@ -120,16 +120,18 @@ struct ApplicationsView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
-                if !application.jobURL.isEmpty {
-                    Label("Stellenanzeige", systemImage: "link")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                if !application.jobURL.isEmpty || application.appliedAt != nil {
+                    HStack(spacing: 6) {
+                        if !application.jobURL.isEmpty {
+                            Text("Stellenanzeige vorhanden")
+                        }
 
-                if let appliedAt = application.appliedAt {
-                    Text("Seit \(appliedAt, style: .date)")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        if let appliedAt = application.appliedAt {
+                            Text("Seit \(appliedAt, style: .date)")
+                        }
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
             }
             .padding(.vertical, 2)

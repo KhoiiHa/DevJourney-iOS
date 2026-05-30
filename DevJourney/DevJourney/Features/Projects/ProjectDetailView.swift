@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ProjectDetailView: View {
+    @Environment(\.dismiss) private var dismiss
+
     let project: PortfolioProject
     @State private var viewModel: ProjectDetailViewModel
 
@@ -48,6 +50,7 @@ struct ProjectDetailView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Speichern") {
                     viewModel.save(to: project)
+                    dismiss()
                 }
                 .disabled(!viewModel.canSave)
             }
