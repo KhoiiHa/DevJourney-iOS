@@ -65,10 +65,15 @@ struct GoalDetailView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Speichern") {
                     viewModel.save(to: goal)
+                    try? modelContext.save()
                     dismiss()
                 }
                 .disabled(!viewModel.canSave)
             }
+        }
+        .onChange(of: viewModel.isCompleted) { _, _ in
+            viewModel.updateCompletion(on: goal)
+            try? modelContext.save()
         }
         .confirmationDialog(
             "Lernziel löschen?",

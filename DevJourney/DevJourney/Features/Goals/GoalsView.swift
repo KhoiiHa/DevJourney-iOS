@@ -108,6 +108,7 @@ struct GoalsView: View {
         HStack(spacing: 12) {
             Button {
                 viewModel.toggleCompletion(for: goal)
+                try? modelContext.save()
             } label: {
                 Image(systemName: goal.isCompleted ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
