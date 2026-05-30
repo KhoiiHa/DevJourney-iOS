@@ -14,6 +14,7 @@ final class ProjectsViewModel {
     var newProjectTitle = ""
     var newProjectSummary = ""
     var newProjectGitHubURL = ""
+    var newProjectNotes = ""
     var newProjectStatus = PortfolioProjectStatus.planned
     var isShowingAddProject = false
 
@@ -40,6 +41,7 @@ final class ProjectsViewModel {
             title: trimmedTitle,
             summary: trimmedSummary,
             githubURL: trimmedGitHubURL,
+            notes: trimmedNotes,
             status: newProjectStatus
         )
         modelContext.insert(project)
@@ -56,6 +58,7 @@ final class ProjectsViewModel {
         newProjectTitle = ""
         newProjectSummary = ""
         newProjectGitHubURL = ""
+        newProjectNotes = ""
         newProjectStatus = PortfolioProjectStatus.planned
         isShowingAddProject = false
     }
@@ -70,5 +73,9 @@ final class ProjectsViewModel {
 
     private var trimmedGitHubURL: String {
         newProjectGitHubURL.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var trimmedNotes: String {
+        newProjectNotes.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

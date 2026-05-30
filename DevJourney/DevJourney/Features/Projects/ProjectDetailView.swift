@@ -25,6 +25,11 @@ struct ProjectDetailView: View {
                     .keyboardType(.URL)
             }
 
+            Section("Notizen") {
+                TextField("Was hast du gebaut oder gelernt?", text: $project.notes, axis: .vertical)
+                    .lineLimit(3...8)
+            }
+
             Section("Status") {
                 Picker("Status", selection: $project.status) {
                     ForEach(availableStatuses, id: \.self) { status in

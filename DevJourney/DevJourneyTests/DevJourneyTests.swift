@@ -34,7 +34,7 @@ struct DevJourneyTests {
     }
 
     @MainActor
-    @Test func projectGitHubURLIsTrimmedWhenAdded() throws {
+    @Test func projectOptionalFieldsAreTrimmedWhenAdded() throws {
         let container = try ModelContainer(
             for: PortfolioProject.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
@@ -42,11 +42,13 @@ struct DevJourneyTests {
         let viewModel = ProjectsViewModel()
         viewModel.newProjectTitle = "DevJourney"
         viewModel.newProjectGitHubURL = " https://github.com/example/devjourney "
+        viewModel.newProjectNotes = " SwiftData persistence built "
 
         viewModel.addProject(using: container.mainContext)
 
         let projects = try container.mainContext.fetch(FetchDescriptor<PortfolioProject>())
         #expect(projects.first?.githubURL == "https://github.com/example/devjourney")
+        #expect(projects.first?.notes == "SwiftData persistence built")
     }
 
     @Test func applicationUsesDefaultStatusAndRequiresCompanyAndPosition() {

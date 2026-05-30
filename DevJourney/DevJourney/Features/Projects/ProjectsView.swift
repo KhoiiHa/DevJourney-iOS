@@ -82,6 +82,11 @@ struct ProjectsView: View {
                             .keyboardType(.URL)
                     }
 
+                    Section("Notizen") {
+                        TextField("Was hast du gebaut oder gelernt?", text: $viewModel.newProjectNotes, axis: .vertical)
+                            .lineLimit(3...8)
+                    }
+
                     Section("Status") {
                         Picker("Status", selection: $viewModel.newProjectStatus) {
                             ForEach(viewModel.availableStatuses, id: \.self) { status in
