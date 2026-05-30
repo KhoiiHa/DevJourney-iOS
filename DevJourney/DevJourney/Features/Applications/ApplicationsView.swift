@@ -62,6 +62,10 @@ struct ApplicationsView: View {
                     Section("Bewerbung") {
                         TextField("Firma", text: $viewModel.companyName)
                         TextField("Position", text: $viewModel.positionTitle)
+
+                        TextField("Stellenanzeige-Link", text: $viewModel.jobURL)
+                            .textInputAutocapitalization(.never)
+                            .keyboardType(.URL)
                     }
 
                     Section("Status") {
@@ -115,6 +119,12 @@ struct ApplicationsView: View {
                 Text(application.companyName)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+
+                if !application.jobURL.isEmpty {
+                    Label("Stellenanzeige", systemImage: "link")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
 
                 if let appliedAt = application.appliedAt {
                     Text("Seit \(appliedAt, style: .date)")

@@ -63,4 +63,21 @@ struct DevJourneyTests {
         #expect(viewModel.canAddApplication == true)
     }
 
+    @MainActor
+    @Test func applicationJobURLIsTrimmedWhenAdded() throws {
+        let container = try ModelContainer(
+            for: JobApplication.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let viewModel = ApplicationsViewModel()
+        viewModel.companyName = "Apple"
+        viewModel.positionTitle = "iOS Developer"
+        viewModel.jobURL = " https://jobs.apple.com/example "
+
+        viewModel.addApplication(using: container.mainContext)
+
+        let applications = try container.mainContext.fetch(FetchDescriptor<JobApplication>())
+        #expect(applications.first?.jobURL == "https://jobs.apple.com/example")
+    }
+
 }

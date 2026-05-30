@@ -17,6 +17,10 @@ struct ApplicationDetailView: View {
             Section("Bewerbung") {
                 TextField("Firma", text: $application.companyName)
                 TextField("Position", text: $application.positionTitle)
+
+                TextField("Stellenanzeige-Link", text: $application.jobURL)
+                    .textInputAutocapitalization(.never)
+                    .keyboardType(.URL)
             }
 
             Section("Status") {

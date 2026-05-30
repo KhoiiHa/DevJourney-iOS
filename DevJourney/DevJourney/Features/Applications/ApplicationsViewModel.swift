@@ -13,6 +13,7 @@ import SwiftData
 final class ApplicationsViewModel {
     var companyName = ""
     var positionTitle = ""
+    var jobURL = ""
     var status = JobApplicationStatus.open
     var hasAppliedDate = false
     var appliedAt = Date()
@@ -40,6 +41,7 @@ final class ApplicationsViewModel {
         let application = JobApplication(
             companyName: trimmedCompanyName,
             positionTitle: trimmedPositionTitle,
+            jobURL: trimmedJobURL,
             status: status,
             appliedAt: hasAppliedDate ? appliedAt : nil
         )
@@ -56,6 +58,7 @@ final class ApplicationsViewModel {
     private func resetForm() {
         companyName = ""
         positionTitle = ""
+        jobURL = ""
         status = JobApplicationStatus.open
         hasAppliedDate = false
         appliedAt = Date()
@@ -68,5 +71,9 @@ final class ApplicationsViewModel {
 
     private var trimmedPositionTitle: String {
         positionTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var trimmedJobURL: String {
+        jobURL.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

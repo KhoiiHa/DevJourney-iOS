@@ -22,6 +22,7 @@ enum JobApplicationStatus {
 final class JobApplication {
     var companyName: String
     var positionTitle: String
+    var jobURL: String
     var status: String
     var appliedAt: Date?
     var createdAt: Date
@@ -29,12 +30,14 @@ final class JobApplication {
     init(
         companyName: String,
         positionTitle: String,
+        jobURL: String = "",
         status: String = JobApplicationStatus.open,
         appliedAt: Date? = nil,
         createdAt: Date = Date()
     ) {
         self.companyName = companyName
         self.positionTitle = positionTitle
+        self.jobURL = jobURL
         self.status = status
         self.appliedAt = appliedAt
         self.createdAt = createdAt
