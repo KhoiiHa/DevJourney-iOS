@@ -64,13 +64,20 @@ struct ApplicationsView: View {
         }) {
             NavigationStack {
                 Form {
-                    Section("Bewerbung") {
+                    Section {
                         TextField("Firma", text: $viewModel.companyName)
                         TextField("Position", text: $viewModel.positionTitle)
 
                         TextField("Stellenanzeige-Link", text: $viewModel.jobURL)
                             .textInputAutocapitalization(.never)
                             .keyboardType(.URL)
+                    } header: {
+                        Text("Bewerbung")
+                    } footer: {
+                        if let validationMessage = viewModel.validationMessage {
+                            Text(validationMessage)
+                                .foregroundStyle(.secondary)
+                        }
                     }
 
                     Section("Status") {

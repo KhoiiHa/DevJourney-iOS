@@ -18,6 +18,10 @@ final class GoalsViewModel {
         !trimmedTitle.isEmpty
     }
 
+    var validationMessage: String? {
+        canAddGoal ? nil : "Titel ist ein Pflichtfeld."
+    }
+
     func startAddingGoal() {
         isShowingAddGoal = true
     }

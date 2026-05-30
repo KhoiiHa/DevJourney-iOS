@@ -20,6 +20,10 @@ final class GoalDetailViewModel {
         !trimmedTitle.isEmpty
     }
 
+    var validationMessage: String? {
+        canSave ? nil : "Titel ist ein Pflichtfeld."
+    }
+
     init(goal: LearningGoal) {
         title = goal.title
         details = goal.details

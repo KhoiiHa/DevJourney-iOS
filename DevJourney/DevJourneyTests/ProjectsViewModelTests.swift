@@ -15,12 +15,14 @@ struct ProjectsViewModelTests {
         let viewModel = ProjectsViewModel()
 
         #expect(viewModel.canAddProject == false)
+        #expect(viewModel.validationMessage == "Titel ist ein Pflichtfeld.")
         #expect(viewModel.newProjectStatus == PortfolioProjectStatus.planned)
 
         viewModel.newProjectTitle = "DevJourney"
         viewModel.newProjectGitHubURL = " https://github.com/example/devjourney "
 
         #expect(viewModel.canAddProject == true)
+        #expect(viewModel.validationMessage == nil)
     }
 
     @MainActor
@@ -48,6 +50,7 @@ struct ProjectsViewModelTests {
         viewModel.title = "  "
 
         #expect(viewModel.canSave == false)
+        #expect(viewModel.validationMessage == "Titel ist ein Pflichtfeld.")
 
         viewModel.title = "  DevJourney iOS  "
         viewModel.summary = "  Lernziele, Projekte und Bewerbungen verwalten  "
@@ -61,6 +64,7 @@ struct ProjectsViewModelTests {
         #expect(project.githubURL == "https://github.com/example/devjourney")
         #expect(project.notes == "SwiftUI und SwiftData MVP")
         #expect(project.status == PortfolioProjectStatus.inProgress)
+        #expect(viewModel.validationMessage == nil)
     }
 
 }

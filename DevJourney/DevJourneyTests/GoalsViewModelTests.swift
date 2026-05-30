@@ -14,10 +14,12 @@ struct GoalsViewModelTests {
         let viewModel = GoalsViewModel()
 
         #expect(viewModel.canAddGoal == false)
+        #expect(viewModel.validationMessage == "Titel ist ein Pflichtfeld.")
 
         viewModel.newGoalTitle = "  SwiftUI lernen  "
 
         #expect(viewModel.canAddGoal == true)
+        #expect(viewModel.validationMessage == nil)
     }
 
     @Test func goalDetailRequiresTitleAndSavesTrimmedValues() {
@@ -27,6 +29,7 @@ struct GoalsViewModelTests {
         viewModel.title = "  "
 
         #expect(viewModel.canSave == false)
+        #expect(viewModel.validationMessage == "Titel ist ein Pflichtfeld.")
 
         viewModel.title = "  SwiftData verstehen  "
         viewModel.details = "  Persistente Daten im MVP nutzen  "
@@ -38,6 +41,7 @@ struct GoalsViewModelTests {
         #expect(goal.details == "Persistente Daten im MVP nutzen")
         #expect(goal.isCompleted == true)
         #expect(goal.targetDate == nil)
+        #expect(viewModel.validationMessage == nil)
     }
 
 }

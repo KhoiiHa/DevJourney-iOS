@@ -24,6 +24,10 @@ final class ProjectsViewModel {
         !trimmedTitle.isEmpty
     }
 
+    var validationMessage: String? {
+        canAddProject ? nil : "Titel ist ein Pflichtfeld."
+    }
+
     func startAddingProject() {
         isShowingAddProject = true
     }

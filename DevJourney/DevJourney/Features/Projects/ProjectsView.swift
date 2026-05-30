@@ -76,7 +76,7 @@ struct ProjectsView: View {
         }) {
             NavigationStack {
                 Form {
-                    Section("Projekt") {
+                    Section {
                         TextField("Titel", text: $viewModel.newProjectTitle)
 
                         TextField("Kurzbeschreibung", text: $viewModel.newProjectSummary, axis: .vertical)
@@ -85,6 +85,13 @@ struct ProjectsView: View {
                         TextField("GitHub-Link", text: $viewModel.newProjectGitHubURL)
                             .textInputAutocapitalization(.never)
                             .keyboardType(.URL)
+                    } header: {
+                        Text("Projekt")
+                    } footer: {
+                        if let validationMessage = viewModel.validationMessage {
+                            Text(validationMessage)
+                                .foregroundStyle(.secondary)
+                        }
                     }
 
                     Section("Notizen") {

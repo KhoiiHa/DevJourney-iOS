@@ -25,6 +25,22 @@ final class ApplicationsViewModel {
         !trimmedCompanyName.isEmpty && !trimmedPositionTitle.isEmpty
     }
 
+    var validationMessage: String? {
+        if canAddApplication {
+            return nil
+        }
+
+        if trimmedCompanyName.isEmpty && trimmedPositionTitle.isEmpty {
+            return "Firma und Position sind Pflichtfelder."
+        }
+
+        if trimmedCompanyName.isEmpty {
+            return "Firma ist ein Pflichtfeld."
+        }
+
+        return "Position ist ein Pflichtfeld."
+    }
+
     func startAddingApplication() {
         isShowingAddApplication = true
     }

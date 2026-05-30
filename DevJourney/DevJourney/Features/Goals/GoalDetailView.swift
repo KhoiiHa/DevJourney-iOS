@@ -23,11 +23,18 @@ struct GoalDetailView: View {
 
     var body: some View {
         Form {
-            Section("Lernziel") {
+            Section {
                 TextField("Titel", text: $viewModel.title)
 
                 TextField("Details", text: $viewModel.details, axis: .vertical)
                     .lineLimit(3...8)
+            } header: {
+                Text("Lernziel")
+            } footer: {
+                if let validationMessage = viewModel.validationMessage {
+                    Text(validationMessage)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Section("Status") {

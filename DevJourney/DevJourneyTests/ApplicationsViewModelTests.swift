@@ -16,12 +16,22 @@ struct ApplicationsViewModelTests {
         let viewModel = ApplicationsViewModel()
 
         #expect(viewModel.canAddApplication == false)
+        #expect(viewModel.validationMessage == "Firma und Position sind Pflichtfelder.")
         #expect(viewModel.status == JobApplicationStatus.open)
 
         viewModel.companyName = "Apple"
+
+        #expect(viewModel.validationMessage == "Position ist ein Pflichtfeld.")
+
+        viewModel.companyName = ""
         viewModel.positionTitle = "iOS Developer"
 
+        #expect(viewModel.validationMessage == "Firma ist ein Pflichtfeld.")
+
+        viewModel.companyName = "Apple"
+
         #expect(viewModel.canAddApplication == true)
+        #expect(viewModel.validationMessage == nil)
     }
 
     @MainActor
@@ -53,6 +63,7 @@ struct ApplicationsViewModelTests {
         viewModel.companyName = "  "
 
         #expect(viewModel.canSave == false)
+        #expect(viewModel.validationMessage == "Firma ist ein Pflichtfeld.")
 
         viewModel.companyName = "  OpenAI  "
         viewModel.positionTitle = "  iOS Engineer  "
@@ -66,6 +77,7 @@ struct ApplicationsViewModelTests {
         #expect(application.jobURL == "https://jobs.example.com/ios")
         #expect(application.status == JobApplicationStatus.interview)
         #expect(application.appliedAt == nil)
+        #expect(viewModel.validationMessage == nil)
     }
 
 }

@@ -23,7 +23,7 @@ struct ProjectDetailView: View {
 
     var body: some View {
         Form {
-            Section("Projekt") {
+            Section {
                 TextField("Titel", text: $viewModel.title)
 
                 TextField("Kurzbeschreibung", text: $viewModel.summary, axis: .vertical)
@@ -32,6 +32,13 @@ struct ProjectDetailView: View {
                 TextField("GitHub-Link", text: $viewModel.githubURL)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
+            } header: {
+                Text("Projekt")
+            } footer: {
+                if let validationMessage = viewModel.validationMessage {
+                    Text(validationMessage)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Section("Notizen") {

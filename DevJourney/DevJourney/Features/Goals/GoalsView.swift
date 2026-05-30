@@ -75,7 +75,14 @@ struct GoalsView: View {
         }) {
             NavigationStack {
                 Form {
-                    TextField("Titel", text: $viewModel.newGoalTitle)
+                    Section {
+                        TextField("Titel", text: $viewModel.newGoalTitle)
+                    } footer: {
+                        if let validationMessage = viewModel.validationMessage {
+                            Text(validationMessage)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
                 }
                 .navigationTitle("Neues Lernziel")
                 .navigationBarTitleDisplayMode(.inline)

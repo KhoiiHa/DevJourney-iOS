@@ -23,6 +23,22 @@ final class ApplicationDetailViewModel {
         !trimmedCompanyName.isEmpty && !trimmedPositionTitle.isEmpty
     }
 
+    var validationMessage: String? {
+        if canSave {
+            return nil
+        }
+
+        if trimmedCompanyName.isEmpty && trimmedPositionTitle.isEmpty {
+            return "Firma und Position sind Pflichtfelder."
+        }
+
+        if trimmedCompanyName.isEmpty {
+            return "Firma ist ein Pflichtfeld."
+        }
+
+        return "Position ist ein Pflichtfeld."
+    }
+
     init(application: JobApplication) {
         companyName = application.companyName
         positionTitle = application.positionTitle

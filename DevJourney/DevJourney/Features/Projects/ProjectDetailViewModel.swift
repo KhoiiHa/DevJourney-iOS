@@ -22,6 +22,10 @@ final class ProjectDetailViewModel {
         !trimmedTitle.isEmpty
     }
 
+    var validationMessage: String? {
+        canSave ? nil : "Titel ist ein Pflichtfeld."
+    }
+
     init(project: PortfolioProject) {
         title = project.title
         summary = project.summary
