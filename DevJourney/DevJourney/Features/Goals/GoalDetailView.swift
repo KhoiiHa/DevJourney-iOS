@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct GoalDetailView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
 
     let goal: LearningGoal
     @State private var viewModel: GoalDetailViewModel
+    @State private var isShowingDeleteConfirmation = false
 
     init(goal: LearningGoal) {
         self.goal = goal
@@ -46,6 +49,12 @@ struct GoalDetailView: View {
         .navigationTitle("Details")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .destructiveAction) {
+                Button("Löschen", role: .destructive) {
+                    isShowingDeleteConfirmation = true
+                }
+            }
+
             ToolbarItem(placement: .confirmationAction) {
                 Button("Speichern") {
                     viewModel.save(to: goal)
@@ -53,6 +62,18 @@ struct GoalDetailView: View {
                 }
                 .disabled(!viewModel.canSave)
             }
+        }
+        .confirmationDialog(
+            "Lernziel löschen?",
+            isPresented: $isShowingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Löschen", role: .destructive) {
+                modelContext.delete(goal)
+                dismiss()
+            }
+        } message: {
+            Text("Diese Aktion kann nicht rückgängig gemacht werden.")
         }
     }
 }

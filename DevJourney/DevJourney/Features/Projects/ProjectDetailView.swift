@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ProjectDetailView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
 
     let project: PortfolioProject
     @State private var viewModel: ProjectDetailViewModel
+    @State private var isShowingDeleteConfirmation = false
 
     init(project: PortfolioProject) {
         self.project = project
@@ -47,6 +50,12 @@ struct ProjectDetailView: View {
         .navigationTitle("Projekt")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .destructiveAction) {
+                Button("Löschen", role: .destructive) {
+                    isShowingDeleteConfirmation = true
+                }
+            }
+
             ToolbarItem(placement: .confirmationAction) {
                 Button("Speichern") {
                     viewModel.save(to: project)
@@ -54,6 +63,18 @@ struct ProjectDetailView: View {
                 }
                 .disabled(!viewModel.canSave)
             }
+        }
+        .confirmationDialog(
+            "Projekt löschen?",
+            isPresented: $isShowingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Löschen", role: .destructive) {
+                modelContext.delete(project)
+                dismiss()
+            }
+        } message: {
+            Text("Diese Aktion kann nicht rückgängig gemacht werden.")
         }
     }
 }

@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ApplicationDetailView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
 
     let application: JobApplication
     @State private var viewModel: ApplicationDetailViewModel
+    @State private var isShowingDeleteConfirmation = false
 
     init(application: JobApplication) {
         self.application = application
@@ -52,6 +55,12 @@ struct ApplicationDetailView: View {
         .navigationTitle("Bewerbung")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .destructiveAction) {
+                Button("Löschen", role: .destructive) {
+                    isShowingDeleteConfirmation = true
+                }
+            }
+
             ToolbarItem(placement: .confirmationAction) {
                 Button("Speichern") {
                     viewModel.save(to: application)
@@ -59,6 +68,18 @@ struct ApplicationDetailView: View {
                 }
                 .disabled(!viewModel.canSave)
             }
+        }
+        .confirmationDialog(
+            "Bewerbung löschen?",
+            isPresented: $isShowingDeleteConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Löschen", role: .destructive) {
+                modelContext.delete(application)
+                dismiss()
+            }
+        } message: {
+            Text("Diese Aktion kann nicht rückgängig gemacht werden.")
         }
     }
 }
