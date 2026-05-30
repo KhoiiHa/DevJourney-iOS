@@ -34,6 +34,10 @@ struct DashboardView: View {
         applications.count
     }
 
+    private var hasAnyContent: Bool {
+        openGoalsCount > 0 || completedGoalsCount > 0 || projectsCount > 0 || applicationsCount > 0
+    }
+
     private var applicationStatusChartData: [DashboardChartValue] {
         JobApplicationStatus.all.map { status in
             DashboardChartValue(
@@ -81,6 +85,10 @@ struct DashboardView: View {
                         )
                     }
 
+                    if !hasAnyContent {
+                        DashboardFirstRunView()
+                    }
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Schnellzugriff")
                             .font(.headline)
@@ -109,21 +117,21 @@ struct DashboardView: View {
                         }
                     }
 
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Bewerbungsstatus")
-                            .font(.headline)
+                    if applicationsCount > 0 {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Bewerbungsstatus")
+                                .font(.headline)
 
-                        LazyVGrid(columns: metricColumns, spacing: 12) {
-                            ForEach(applicationStatusChartData) { statusValue in
-                                DashboardStatusView(
-                                    title: statusValue.title,
-                                    value: statusValue.value
-                                )
+                            LazyVGrid(columns: metricColumns, spacing: 12) {
+                                ForEach(applicationStatusChartData) { statusValue in
+                                    DashboardStatusView(
+                                        title: statusValue.title,
+                                        value: statusValue.value
+                                    )
+                                }
                             }
                         }
-                    }
 
-                    if applicationsCount > 0 {
                         DashboardBarChartView(
                             title: "Bewerbungen nach Status",
                             values: applicationStatusChartData
@@ -135,6 +143,38 @@ struct DashboardView: View {
             }
             .navigationTitle("Dashboard")
             .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+private struct DashboardFirstRunView: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Erste Schritte")
+                .font(.headline)
+
+            VStack(spacing: 8) {
+                DashboardNavigationLink(
+                    title: "Erstes Lernziel erfassen",
+                    systemImage: "target"
+                ) {
+                    GoalsView()
+                }
+
+                DashboardNavigationLink(
+                    title: "Erstes Projekt erfassen",
+                    systemImage: "folder"
+                ) {
+                    ProjectsView()
+                }
+
+                DashboardNavigationLink(
+                    title: "Erste Bewerbung erfassen",
+                    systemImage: "briefcase"
+                ) {
+                    ApplicationsView()
+                }
+            }
         }
     }
 }
