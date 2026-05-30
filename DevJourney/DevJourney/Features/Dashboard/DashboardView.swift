@@ -60,29 +60,37 @@ struct DashboardView: View {
                         .foregroundStyle(.secondary)
 
                     LazyVGrid(columns: metricColumns, spacing: 12) {
-                        DashboardMetricView(
+                        DashboardMetricLink(
                             title: "Offene Ziele",
                             value: openGoalsCount,
                             systemImage: "circle"
-                        )
+                        ) {
+                            GoalsView()
+                        }
 
-                        DashboardMetricView(
+                        DashboardMetricLink(
                             title: "Erledigte Ziele",
                             value: completedGoalsCount,
                             systemImage: "checkmark.circle.fill"
-                        )
+                        ) {
+                            GoalsView()
+                        }
 
-                        DashboardMetricView(
+                        DashboardMetricLink(
                             title: "Projekte",
                             value: projectsCount,
                             systemImage: "folder"
-                        )
+                        ) {
+                            ProjectsView()
+                        }
 
-                        DashboardMetricView(
+                        DashboardMetricLink(
                             title: "Bewerbungen",
                             value: applicationsCount,
                             systemImage: "briefcase"
-                        )
+                        ) {
+                            ApplicationsView()
+                        }
                     }
 
                     if !hasAnyContent {
@@ -263,16 +271,48 @@ private struct DashboardStatusView: View {
     }
 }
 
+private struct DashboardMetricLink<Destination: View>: View {
+    let title: String
+    let value: Int
+    let systemImage: String
+    let destination: () -> Destination
+
+    var body: some View {
+        NavigationLink {
+            destination()
+        } label: {
+            DashboardMetricView(
+                title: title,
+                value: value,
+                systemImage: systemImage,
+                showsDisclosure: true
+            )
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 private struct DashboardMetricView: View {
     let title: String
     let value: Int
     let systemImage: String
+    let showsDisclosure: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Image(systemName: systemImage)
-                .font(.title3)
-                .foregroundStyle(.secondary)
+            HStack {
+                Image(systemName: systemImage)
+
+                Spacer()
+
+                if showsDisclosure {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .font(.title3)
+            .foregroundStyle(.secondary)
 
             Text("\(value)")
                 .font(.title3)
