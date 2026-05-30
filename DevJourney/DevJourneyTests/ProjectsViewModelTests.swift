@@ -41,4 +41,26 @@ struct ProjectsViewModelTests {
         #expect(projects.first?.notes == "SwiftData persistence built")
     }
 
+    @Test func projectDetailRequiresTitleAndSavesTrimmedValues() {
+        let project = PortfolioProject(title: "DevJourney")
+        let viewModel = ProjectDetailViewModel(project: project)
+
+        viewModel.title = "  "
+
+        #expect(viewModel.canSave == false)
+
+        viewModel.title = "  DevJourney iOS  "
+        viewModel.summary = "  Lernziele, Projekte und Bewerbungen verwalten  "
+        viewModel.githubURL = " https://github.com/example/devjourney "
+        viewModel.notes = " SwiftUI und SwiftData MVP "
+        viewModel.status = PortfolioProjectStatus.inProgress
+        viewModel.save(to: project)
+
+        #expect(project.title == "DevJourney iOS")
+        #expect(project.summary == "Lernziele, Projekte und Bewerbungen verwalten")
+        #expect(project.githubURL == "https://github.com/example/devjourney")
+        #expect(project.notes == "SwiftUI und SwiftData MVP")
+        #expect(project.status == PortfolioProjectStatus.inProgress)
+    }
+
 }

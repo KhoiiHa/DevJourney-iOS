@@ -8,31 +8,35 @@
 import SwiftUI
 
 struct ProjectDetailView: View {
-    @Bindable var project: PortfolioProject
+    let project: PortfolioProject
+    @State private var viewModel: ProjectDetailViewModel
 
-    private let availableStatuses = PortfolioProjectStatus.all
+    init(project: PortfolioProject) {
+        self.project = project
+        _viewModel = State(initialValue: ProjectDetailViewModel(project: project))
+    }
 
     var body: some View {
         Form {
             Section("Projekt") {
-                TextField("Titel", text: $project.title)
+                TextField("Titel", text: $viewModel.title)
 
-                TextField("Kurzbeschreibung", text: $project.summary, axis: .vertical)
+                TextField("Kurzbeschreibung", text: $viewModel.summary, axis: .vertical)
                     .lineLimit(2...6)
 
-                TextField("GitHub-Link", text: $project.githubURL)
+                TextField("GitHub-Link", text: $viewModel.githubURL)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
             }
 
             Section("Notizen") {
-                TextField("Was hast du gebaut oder gelernt?", text: $project.notes, axis: .vertical)
+                TextField("Was hast du gebaut oder gelernt?", text: $viewModel.notes, axis: .vertical)
                     .lineLimit(3...8)
             }
 
             Section("Status") {
-                Picker("Status", selection: $project.status) {
-                    ForEach(availableStatuses, id: \.self) { status in
+                Picker("Status", selection: $viewModel.status) {
+                    ForEach(viewModel.availableStatuses, id: \.self) { status in
                         Text(status)
                     }
                 }
@@ -40,6 +44,14 @@ struct ProjectDetailView: View {
         }
         .navigationTitle("Projekt")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Speichern") {
+                    viewModel.save(to: project)
+                }
+                .disabled(!viewModel.canSave)
+            }
+        }
     }
 }
 
