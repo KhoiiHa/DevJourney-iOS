@@ -124,7 +124,7 @@ struct ApplicationsView: View {
         NavigationLink {
             ApplicationDetailView(application: application)
         } label: {
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(application.positionTitle)
                     .font(.headline)
 
@@ -133,20 +133,20 @@ struct ApplicationsView: View {
                     .foregroundStyle(.secondary)
 
                 if !application.jobURL.isEmpty || application.appliedAt != nil {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         if !application.jobURL.isEmpty {
-                            Text("Stellenanzeige vorhanden")
+                            Label("Stellenanzeige", systemImage: "link")
                         }
 
                         if let appliedAt = application.appliedAt {
-                            Text("Seit \(appliedAt, style: .date)")
+                            Label("Seit \(appliedAt, style: .date)", systemImage: "calendar")
                         }
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 }
             }
-            .padding(.vertical, 2)
+            .padding(.vertical, 4)
         }
     }
 }

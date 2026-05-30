@@ -118,25 +118,39 @@ struct GoalsView: View {
             NavigationLink {
                 GoalDetailView(goal: goal)
             } label: {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(goal.title)
                         .font(.headline)
                         .strikethrough(goal.isCompleted)
                         .foregroundStyle(goal.isCompleted ? .secondary : .primary)
 
-                    Text(goal.isCompleted ? "Erledigt" : "Offen")
-                        .font(.caption)
-                        .foregroundStyle(goal.isCompleted ? .green : .secondary)
+                    HStack(spacing: 8) {
+                        GoalStatusBadge(isCompleted: goal.isCompleted)
 
-                    if let targetDate = goal.targetDate {
-                        Text("Ziel: \(targetDate, style: .date)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                        if let targetDate = goal.targetDate {
+                            Label("Ziel: \(targetDate, style: .date)", systemImage: "calendar")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             }
         }
-        .padding(.vertical, 2)
+        .padding(.vertical, 4)
+    }
+}
+
+private struct GoalStatusBadge: View {
+    let isCompleted: Bool
+
+    var body: some View {
+        Text(isCompleted ? "Erledigt" : "Offen")
+            .font(.caption.weight(.medium))
+            .foregroundStyle(isCompleted ? .green : .secondary)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(isCompleted ? Color.green.opacity(0.12) : Color.secondary.opacity(0.12))
+            .clipShape(Capsule())
     }
 }
 

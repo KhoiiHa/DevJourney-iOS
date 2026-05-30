@@ -31,7 +31,7 @@ struct ProjectsView: View {
                     NavigationLink {
                         ProjectDetailView(project: project)
                     } label: {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 6) {
                             Text(project.title)
                                 .font(.headline)
 
@@ -41,18 +41,18 @@ struct ProjectsView: View {
                                     .foregroundStyle(.secondary)
                             }
 
-                            HStack(spacing: 6) {
-                                Text(project.status)
+                            HStack(spacing: 8) {
+                                ProjectStatusBadge(status: project.status)
 
                                 if !project.githubURL.isEmpty {
-                                    Text("GitHub-Link vorhanden")
+                                    Label("GitHub", systemImage: "link")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
                                 }
                             }
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
                         }
                     }
-                    .padding(.vertical, 2)
+                    .padding(.vertical, 4)
                 }
                 .onDelete { offsets in
                     viewModel.deleteProjects(at: offsets, from: projects, using: modelContext)
@@ -125,6 +125,31 @@ struct ProjectsView: View {
                 }
             }
         }
+    }
+}
+
+private struct ProjectStatusBadge: View {
+    let status: String
+
+    private var tint: Color {
+        switch status {
+        case PortfolioProjectStatus.inProgress:
+            return .blue
+        case PortfolioProjectStatus.completed:
+            return .green
+        default:
+            return .secondary
+        }
+    }
+
+    var body: some View {
+        Text(status)
+            .font(.caption.weight(.medium))
+            .foregroundStyle(tint)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(tint.opacity(0.12))
+            .clipShape(Capsule())
     }
 }
 
