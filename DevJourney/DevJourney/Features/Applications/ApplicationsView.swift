@@ -15,18 +15,31 @@ struct ApplicationsView: View {
     @State private var errorMessage: String?
     @State private var searchText = ""
 
+    private var sortedApplications: [JobApplication] {
+        applications.sorted { firstApplication, secondApplication in
+            let firstPriority = priority(for: firstApplication.status)
+            let secondPriority = priority(for: secondApplication.status)
+
+            if firstPriority == secondPriority {
+                return firstApplication.createdAt > secondApplication.createdAt
+            }
+
+            return firstPriority < secondPriority
+        }
+    }
+
     private var filteredApplications: [JobApplication] {
         guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return applications
+            return sortedApplications
         }
 
-        return applications.filter { application in
+        return sortedApplications.filter { application in
             application.companyName.localizedStandardContains(searchText) ||
             application.positionTitle.localizedStandardContains(searchText) ||
             application.jobURL.localizedStandardContains(searchText)
         }
     }
-    
+
     private var isSearching: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -171,6 +184,19 @@ struct ApplicationsView: View {
             return .red
         default:
             return .secondary
+        }
+    }
+
+    private func priority(for status: String) -> Int {
+        switch status {
+        case JobApplicationStatus.interview:
+            return 0
+        case JobApplicationStatus.applied:
+            return 1
+        case JobApplicationStatus.rejected:
+            return 3
+        default:
+            return 2
         }
     }
 
