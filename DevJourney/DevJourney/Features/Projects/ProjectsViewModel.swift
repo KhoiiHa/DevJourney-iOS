@@ -53,11 +53,6 @@ final class ProjectsViewModel {
         resetForm()
     }
 
-    func deleteProjects(at offsets: IndexSet, from projects: [PortfolioProject], using modelContext: ModelContext) {
-        for index in offsets {
-            modelContext.delete(projects[index])
-        }
-    }
 
     private func resetForm() {
         newProjectTitle = ""
