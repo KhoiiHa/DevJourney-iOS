@@ -46,18 +46,33 @@ struct DashboardView: View {
             )
         }
     }
+    
+    private func color(forApplicationStatus status: String) -> Color {
+        switch status {
+        case JobApplicationStatus.applied:
+            return .blue
+        case JobApplicationStatus.interview:
+            return .green
+        case JobApplicationStatus.rejected:
+            return .red
+        default:
+            return .secondary
+        }
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    Text("DevJourney")
-                        .font(.title)
-                        .fontWeight(.bold)
+                VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("DevJourney")
+                            .font(.title)
+                            .fontWeight(.bold)
 
-                    Text("Lernziele, Portfolio-Projekte und Bewerbungen an einem Ort.")
-                        .font(.body)
-                        .foregroundStyle(.secondary)
+                        Text("Dein persönliches Cockpit für Lernziele, Portfolio-Projekte und Bewerbungen.")
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                    }
 
                     LazyVGrid(columns: metricColumns, spacing: 12) {
                         DashboardMetricLink(
@@ -134,7 +149,8 @@ struct DashboardView: View {
                                 ForEach(applicationStatusChartData) { statusValue in
                                     DashboardStatusView(
                                         title: statusValue.title,
-                                        value: statusValue.value
+                                        value: statusValue.value,
+                                        color: color(forApplicationStatus: statusValue.title)
                                     )
                                 }
                             }
@@ -208,7 +224,7 @@ private struct DashboardNavigationLink<Destination: View>: View {
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
             .background(.thinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
     }
@@ -246,28 +262,27 @@ private struct DashboardBarChartView: View {
         }
         .padding(14)
         .background(.thinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
 private struct DashboardStatusView: View {
     let title: String
     let value: Int
+    let color: Color
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("\(value)")
                 .font(.headline)
 
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+            StatusBadgeView(title: title, color: color)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .background(.thinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
@@ -325,7 +340,7 @@ private struct DashboardMetricView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .background(.thinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 

@@ -24,7 +24,7 @@ struct GoalsView: View {
             goal.title.localizedStandardContains(searchText)
         }
     }
-    
+
     private var isSearching: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -158,7 +158,10 @@ struct GoalsView: View {
                         .foregroundStyle(goal.isCompleted ? .secondary : .primary)
 
                     HStack(spacing: 8) {
-                        GoalStatusBadge(isCompleted: goal.isCompleted)
+                        StatusBadgeView(
+                            title: goal.isCompleted ? "Erledigt" : "Offen",
+                            color: goal.isCompleted ? .green : .secondary
+                        )
 
                         if let targetDate = goal.targetDate {
                             Label("Ziel: \(targetDate, style: .date)", systemImage: "calendar")
@@ -207,20 +210,6 @@ struct GoalsView: View {
         } catch {
             errorMessage = "Das Lernziel konnte nicht gelöscht werden."
         }
-    }
-}
-
-private struct GoalStatusBadge: View {
-    let isCompleted: Bool
-
-    var body: some View {
-        Text(isCompleted ? "Erledigt" : "Offen")
-            .font(.caption.weight(.medium))
-            .foregroundStyle(isCompleted ? .green : .secondary)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 3)
-            .background(isCompleted ? Color.green.opacity(0.12) : Color.secondary.opacity(0.12))
-            .clipShape(Capsule())
     }
 }
 
