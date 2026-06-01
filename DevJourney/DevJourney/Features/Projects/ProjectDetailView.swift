@@ -15,6 +15,7 @@ struct ProjectDetailView: View {
     let project: PortfolioProject
     @State private var viewModel: ProjectDetailViewModel
     @State private var isShowingDeleteConfirmation = false
+    @State private var errorMessage: String?
 
     init(project: PortfolioProject) {
         self.project = project
@@ -65,8 +66,7 @@ struct ProjectDetailView: View {
 
             ToolbarItem(placement: .confirmationAction) {
                 Button("Speichern") {
-                    viewModel.save(to: project)
-                    dismiss()
+                    saveProject()
                 }
                 .disabled(!viewModel.canSave)
             }
@@ -77,11 +77,39 @@ struct ProjectDetailView: View {
             titleVisibility: .visible
         ) {
             Button("Löschen", role: .destructive) {
-                modelContext.delete(project)
-                dismiss()
+                deleteProject()
             }
         } message: {
             Text("Diese Aktion kann nicht rückgängig gemacht werden.")
+        }
+        .alert("Aktion fehlgeschlagen", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage ?? "Bitte versuche es erneut.")
+        }
+    }
+    private func saveProject() {
+        viewModel.save(to: project)
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            errorMessage = "Das Projekt konnte nicht gespeichert werden."
+        }
+    }
+
+    private func deleteProject() {
+        modelContext.delete(project)
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            errorMessage = "Das Projekt konnte nicht gelöscht werden."
         }
     }
 }
