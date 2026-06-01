@@ -161,6 +161,19 @@ struct ApplicationsView: View {
         }
     }
 
+    private func color(for status: String) -> Color {
+        switch status {
+        case JobApplicationStatus.applied:
+            return .blue
+        case JobApplicationStatus.interview:
+            return .green
+        case JobApplicationStatus.rejected:
+            return .red
+        default:
+            return .secondary
+        }
+    }
+
     private func applicationRow(for application: JobApplication) -> some View {
         NavigationLink {
             ApplicationDetailView(application: application)
@@ -172,6 +185,11 @@ struct ApplicationsView: View {
                 Text(application.companyName)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+
+                StatusBadgeView(
+                    title: application.status,
+                    color: color(for: application.status)
+                )
 
                 if !application.jobURL.isEmpty || application.appliedAt != nil {
                     HStack(spacing: 8) {

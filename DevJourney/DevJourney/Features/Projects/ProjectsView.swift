@@ -50,7 +50,10 @@ struct ProjectsView: View {
                             }
 
                             HStack(spacing: 8) {
-                                ProjectStatusBadge(status: project.status)
+                                StatusBadgeView(
+                                    title: project.status,
+                                    color: color(for: project.status)
+                                )
 
                                 if !project.githubURL.isEmpty {
                                     Label("GitHub", systemImage: "link")
@@ -159,9 +162,19 @@ struct ProjectsView: View {
             project.githubURL.localizedStandardContains(searchText)
         }
     }
-    
     private var isSearching: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private func color(for status: String) -> Color {
+        switch status {
+        case PortfolioProjectStatus.inProgress:
+            return .blue
+        case PortfolioProjectStatus.completed:
+            return .green
+        default:
+            return .secondary
+        }
     }
 
     private func addProject() {
@@ -180,31 +193,6 @@ struct ProjectsView: View {
         } catch {
             errorMessage = "Das Projekt konnte nicht gelöscht werden."
         }
-    }
-}
-
-private struct ProjectStatusBadge: View {
-    let status: String
-
-    private var tint: Color {
-        switch status {
-        case PortfolioProjectStatus.inProgress:
-            return .blue
-        case PortfolioProjectStatus.completed:
-            return .green
-        default:
-            return .secondary
-        }
-    }
-
-    var body: some View {
-        Text(status)
-            .font(.caption.weight(.medium))
-            .foregroundStyle(tint)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 3)
-            .background(tint.opacity(0.12))
-            .clipShape(Capsule())
     }
 }
 
