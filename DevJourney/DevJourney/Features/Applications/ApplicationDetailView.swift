@@ -15,6 +15,7 @@ struct ApplicationDetailView: View {
     let application: JobApplication
     @State private var viewModel: ApplicationDetailViewModel
     @State private var isShowingDeleteConfirmation = false
+    @State private var errorMessage: String?
 
     init(application: JobApplication) {
         self.application = application
@@ -70,8 +71,7 @@ struct ApplicationDetailView: View {
 
             ToolbarItem(placement: .confirmationAction) {
                 Button("Speichern") {
-                    viewModel.save(to: application)
-                    dismiss()
+                    saveApplication()
                 }
                 .disabled(!viewModel.canSave)
             }
@@ -82,11 +82,40 @@ struct ApplicationDetailView: View {
             titleVisibility: .visible
         ) {
             Button("Löschen", role: .destructive) {
-                modelContext.delete(application)
-                dismiss()
+                deleteApplication()
             }
         } message: {
             Text("Diese Aktion kann nicht rückgängig gemacht werden.")
+        }
+        .alert("Aktion fehlgeschlagen", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage ?? "Bitte versuche es erneut.")
+        }
+    }
+
+    private func saveApplication() {
+        viewModel.save(to: application)
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            errorMessage = "Die Bewerbung konnte nicht gespeichert werden."
+        }
+    }
+
+    private func deleteApplication() {
+        modelContext.delete(application)
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            errorMessage = "Die Bewerbung konnte nicht gelöscht werden."
         }
     }
 }
