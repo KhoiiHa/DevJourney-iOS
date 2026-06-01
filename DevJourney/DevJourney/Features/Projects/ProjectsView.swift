@@ -16,8 +16,6 @@ struct ProjectsView: View {
     @State private var searchText = ""
 
     var body: some View {
-        // Computed property for filtering
-        // See below for filteredProjects
         List {
             if projects.isEmpty {
                 ContentUnavailableView {
@@ -29,6 +27,12 @@ struct ProjectsView: View {
                         viewModel.startAddingProject()
                     }
                     .buttonStyle(.borderedProminent)
+                }
+            } else if isSearching && filteredProjects.isEmpty {
+                ContentUnavailableView {
+                    Label("Keine passenden Projekte", systemImage: "magnifyingglass")
+                } description: {
+                    Text("Passe deinen Suchbegriff an oder lege ein neues Projekt an.")
                 }
             } else {
                 ForEach(filteredProjects) { project in
@@ -154,6 +158,10 @@ struct ProjectsView: View {
             project.summary.localizedStandardContains(searchText) ||
             project.githubURL.localizedStandardContains(searchText)
         }
+    }
+    
+    private var isSearching: Bool {
+        !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     private func addProject() {
