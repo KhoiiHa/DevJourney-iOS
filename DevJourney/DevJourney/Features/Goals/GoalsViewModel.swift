@@ -41,11 +41,6 @@ final class GoalsViewModel {
         resetForm()
     }
 
-    func deleteGoals(at offsets: IndexSet, from goals: [LearningGoal], using modelContext: ModelContext) {
-        for index in offsets {
-            modelContext.delete(goals[index])
-        }
-    }
 
     func toggleCompletion(for goal: LearningGoal) {
         goal.isCompleted.toggle()

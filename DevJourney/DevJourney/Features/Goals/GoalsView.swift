@@ -13,13 +13,24 @@ struct GoalsView: View {
     @Query(sort: \LearningGoal.createdAt, order: .reverse) private var goals: [LearningGoal]
     @State private var viewModel = GoalsViewModel()
     @State private var errorMessage: String?
+    @State private var searchText = ""
+
+    private var filteredGoals: [LearningGoal] {
+        guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return goals
+        }
+
+        return goals.filter { goal in
+            goal.title.localizedStandardContains(searchText)
+        }
+    }
 
     private var openGoals: [LearningGoal] {
-        goals.filter { !$0.isCompleted }
+        filteredGoals.filter { !$0.isCompleted }
     }
 
     private var completedGoals: [LearningGoal] {
-        goals.filter(\.isCompleted)
+        filteredGoals.filter(\.isCompleted)
     }
 
     var body: some View {
@@ -41,9 +52,6 @@ struct GoalsView: View {
                         ForEach(openGoals) { goal in
                             goalRow(for: goal)
                         }
-                        .onDelete { offsets in
-                            viewModel.deleteGoals(at: offsets, from: openGoals, using: modelContext)
-                        }
                     }
                 }
 
@@ -52,9 +60,6 @@ struct GoalsView: View {
                         ForEach(completedGoals) { goal in
                             goalRow(for: goal)
                         }
-                        .onDelete { offsets in
-                            viewModel.deleteGoals(at: offsets, from: completedGoals, using: modelContext)
-                        }
                     }
                 }
             }
@@ -62,6 +67,7 @@ struct GoalsView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Lernziele")
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, prompt: "Lernziele suchen")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -96,7 +102,7 @@ struct GoalsView: View {
 
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Speichern") {
-                            viewModel.addGoal(using: modelContext)
+                            addGoal()
                         }
                         .disabled(!viewModel.canAddGoal)
                     }
@@ -110,6 +116,14 @@ struct GoalsView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text(errorMessage ?? "Bitte versuche es erneut.")
+        }
+    }
+
+    private func addGoal() {
+        do {
+            try viewModel.addGoal(using: modelContext)
+        } catch {
+            errorMessage = "Das Lernziel konnte nicht erstellt werden."
         }
     }
 
