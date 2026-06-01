@@ -15,12 +15,18 @@ struct GoalsView: View {
     @State private var errorMessage: String?
     @State private var searchText = ""
 
+    private var sortedGoals: [LearningGoal] {
+        goals.sorted { firstGoal, secondGoal in
+            firstGoal.createdAt > secondGoal.createdAt
+        }
+    }
+
     private var filteredGoals: [LearningGoal] {
         guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return goals
+            return sortedGoals
         }
 
-        return goals.filter { goal in
+        return sortedGoals.filter { goal in
             goal.title.localizedStandardContains(searchText)
         }
     }
