@@ -14,6 +14,7 @@ struct GoalsView: View {
     @State private var viewModel = GoalsViewModel()
     @State private var errorMessage: String?
     @State private var searchText = ""
+    @FocusState private var isTitleFieldFocused: Bool
 
     private var sortedGoals: [LearningGoal] {
         goals.sorted { firstGoal, secondGoal in
@@ -100,6 +101,13 @@ struct GoalsView: View {
                 Form {
                     Section {
                         TextField("Titel", text: $viewModel.newGoalTitle)
+                            .focused($isTitleFieldFocused)
+                            .submitLabel(.done)
+                            .onSubmit {
+                                if viewModel.canAddGoal {
+                                    addGoal()
+                                }
+                            }
                     } footer: {
                         if let validationMessage = viewModel.validationMessage {
                             Text(validationMessage)
@@ -123,6 +131,9 @@ struct GoalsView: View {
                         .disabled(!viewModel.canAddGoal)
                     }
                 }
+                .onAppear {
+                    isTitleFieldFocused = true
+                }
             }
         }
         .alert("Aktion fehlgeschlagen", isPresented: Binding(
@@ -138,6 +149,7 @@ struct GoalsView: View {
     private func addGoal() {
         do {
             try viewModel.addGoal(using: modelContext)
+            isTitleFieldFocused = false
         } catch {
             errorMessage = "Das Lernziel konnte nicht erstellt werden."
         }
