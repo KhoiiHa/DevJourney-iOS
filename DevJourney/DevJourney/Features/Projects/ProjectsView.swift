@@ -13,8 +13,11 @@ struct ProjectsView: View {
     @Query(sort: \PortfolioProject.createdAt, order: .reverse) private var projects: [PortfolioProject]
     @State private var viewModel = ProjectsViewModel()
     @State private var errorMessage: String?
+    @State private var searchText = ""
 
     var body: some View {
+        // Computed property for filtering
+        // See below for filteredProjects
         List {
             if projects.isEmpty {
                 ContentUnavailableView {
@@ -28,7 +31,7 @@ struct ProjectsView: View {
                     .buttonStyle(.borderedProminent)
                 }
             } else {
-                ForEach(projects) { project in
+                ForEach(filteredProjects) { project in
                     NavigationLink {
                         ProjectDetailView(project: project)
                     } label: {
@@ -67,6 +70,7 @@ struct ProjectsView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Projekte")
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, prompt: "Projekte suchen")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -123,7 +127,7 @@ struct ProjectsView: View {
 
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Speichern") {
-                            viewModel.addProject(using: modelContext)
+                            addProject()
                         }
                         .disabled(!viewModel.canAddProject)
                     }
@@ -137,6 +141,26 @@ struct ProjectsView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text(errorMessage ?? "Bitte versuche es erneut.")
+        }
+    }
+
+    private var filteredProjects: [PortfolioProject] {
+        guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return projects
+        }
+
+        return projects.filter { project in
+            project.title.localizedStandardContains(searchText) ||
+            project.summary.localizedStandardContains(searchText) ||
+            project.githubURL.localizedStandardContains(searchText)
+        }
+    }
+
+    private func addProject() {
+        do {
+            try viewModel.addProject(using: modelContext)
+        } catch {
+            errorMessage = "Das Projekt konnte nicht erstellt werden."
         }
     }
 
