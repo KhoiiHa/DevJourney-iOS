@@ -24,6 +24,10 @@ struct GoalsView: View {
             goal.title.localizedStandardContains(searchText)
         }
     }
+    
+    private var isSearching: Bool {
+        !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 
     private var openGoals: [LearningGoal] {
         filteredGoals.filter { !$0.isCompleted }
@@ -45,6 +49,12 @@ struct GoalsView: View {
                         viewModel.startAddingGoal()
                     }
                     .buttonStyle(.borderedProminent)
+                }
+            } else if isSearching && filteredGoals.isEmpty {
+                ContentUnavailableView {
+                    Label("Keine passenden Lernziele", systemImage: "magnifyingglass")
+                } description: {
+                    Text("Passe deinen Suchbegriff an oder lege ein neues Lernziel an.")
                 }
             } else {
                 if !openGoals.isEmpty {
