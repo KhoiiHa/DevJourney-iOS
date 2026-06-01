@@ -30,13 +30,14 @@ final class GoalsViewModel {
         resetForm()
     }
 
-    func addGoal(using modelContext: ModelContext) {
+    func addGoal(using modelContext: ModelContext) throws {
         guard canAddGoal else {
             return
         }
 
         let goal = LearningGoal(title: trimmedTitle)
         modelContext.insert(goal)
+        try modelContext.save()
         resetForm()
     }
 
