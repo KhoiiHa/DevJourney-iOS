@@ -14,6 +14,7 @@ struct ProjectsView: View {
     @State private var viewModel = ProjectsViewModel()
     @State private var errorMessage: String?
     @State private var searchText = ""
+    @FocusState private var isTitleFieldFocused: Bool
 
     private var sortedProjects: [PortfolioProject] {
         projects.sorted { firstProject, secondProject in
@@ -107,13 +108,22 @@ struct ProjectsView: View {
                 Form {
                     Section {
                         TextField("Titel", text: $viewModel.newProjectTitle)
+                            .focused($isTitleFieldFocused)
+                            .submitLabel(.next)
 
                         TextField("Kurzbeschreibung", text: $viewModel.newProjectSummary, axis: .vertical)
                             .lineLimit(2...5)
 
                         TextField("GitHub-Link", text: $viewModel.newProjectGitHubURL)
                             .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
                             .keyboardType(.URL)
+                            .submitLabel(.done)
+                            .onSubmit {
+                                if viewModel.canAddProject {
+                                    addProject()
+                                }
+                            }
                     } header: {
                         Text("Projekt")
                     } footer: {
@@ -151,6 +161,9 @@ struct ProjectsView: View {
                         }
                         .disabled(!viewModel.canAddProject)
                     }
+                }
+                .onAppear {
+                    isTitleFieldFocused = true
                 }
             }
         }
@@ -205,6 +218,7 @@ struct ProjectsView: View {
     private func addProject() {
         do {
             try viewModel.addProject(using: modelContext)
+            isTitleFieldFocused = false
         } catch {
             errorMessage = "Das Projekt konnte nicht erstellt werden."
         }
