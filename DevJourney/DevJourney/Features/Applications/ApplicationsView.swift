@@ -26,6 +26,10 @@ struct ApplicationsView: View {
             application.jobURL.localizedStandardContains(searchText)
         }
     }
+    
+    private var isSearching: Bool {
+        !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 
     var body: some View {
         List {
@@ -39,6 +43,12 @@ struct ApplicationsView: View {
                         viewModel.startAddingApplication()
                     }
                     .buttonStyle(.borderedProminent)
+                }
+            } else if isSearching && filteredApplications.isEmpty {
+                ContentUnavailableView {
+                    Label("Keine passenden Bewerbungen", systemImage: "magnifyingglass")
+                } description: {
+                    Text("Passe deinen Suchbegriff an oder lege eine neue Bewerbung an.")
                 }
             } else {
                 ForEach(viewModel.availableStatuses, id: \.self) { status in
