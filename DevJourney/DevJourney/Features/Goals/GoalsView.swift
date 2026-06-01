@@ -12,6 +12,7 @@ struct GoalsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \LearningGoal.createdAt, order: .reverse) private var goals: [LearningGoal]
     @State private var viewModel = GoalsViewModel()
+    @State private var errorMessage: String?
 
     private var openGoals: [LearningGoal] {
         goals.filter { !$0.isCompleted }
@@ -102,13 +103,20 @@ struct GoalsView: View {
                 }
             }
         }
+        .alert("Aktion fehlgeschlagen", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage ?? "Bitte versuche es erneut.")
+        }
     }
 
     private func goalRow(for goal: LearningGoal) -> some View {
         HStack(spacing: 12) {
             Button {
-                viewModel.toggleCompletion(for: goal)
-                try? modelContext.save()
+                toggleGoalCompletion(goal)
             } label: {
                 Image(systemName: goal.isCompleted ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
@@ -138,6 +146,43 @@ struct GoalsView: View {
             }
         }
         .padding(.vertical, 4)
+        .swipeActions(edge: .trailing) {
+            Button(role: .destructive) {
+                deleteGoal(goal)
+            } label: {
+                Label("Löschen", systemImage: "trash")
+            }
+
+            Button {
+                toggleGoalCompletion(goal)
+            } label: {
+                Label(
+                    goal.isCompleted ? "Wieder öffnen" : "Erledigt",
+                    systemImage: goal.isCompleted ? "arrow.uturn.backward" : "checkmark"
+                )
+            }
+            .tint(goal.isCompleted ? .orange : .green)
+        }
+    }
+
+    private func toggleGoalCompletion(_ goal: LearningGoal) {
+        viewModel.toggleCompletion(for: goal)
+
+        do {
+            try modelContext.save()
+        } catch {
+            errorMessage = "Der Lernziel-Status konnte nicht gespeichert werden."
+        }
+    }
+
+    private func deleteGoal(_ goal: LearningGoal) {
+        modelContext.delete(goal)
+
+        do {
+            try modelContext.save()
+        } catch {
+            errorMessage = "Das Lernziel konnte nicht gelöscht werden."
+        }
     }
 }
 
