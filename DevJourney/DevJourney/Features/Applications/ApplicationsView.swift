@@ -14,6 +14,7 @@ struct ApplicationsView: View {
     @State private var viewModel = ApplicationsViewModel()
     @State private var errorMessage: String?
     @State private var searchText = ""
+    @FocusState private var isCompanyFieldFocused: Bool
 
     private var sortedApplications: [JobApplication] {
         applications.sorted { firstApplication, secondApplication in
@@ -104,11 +105,22 @@ struct ApplicationsView: View {
                 Form {
                     Section {
                         TextField("Firma", text: $viewModel.companyName)
+                            .focused($isCompanyFieldFocused)
+                            .submitLabel(.next)
+
                         TextField("Position", text: $viewModel.positionTitle)
+                            .submitLabel(.next)
 
                         TextField("Stellenanzeige-Link", text: $viewModel.jobURL)
                             .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
                             .keyboardType(.URL)
+                            .submitLabel(.done)
+                            .onSubmit {
+                                if viewModel.canAddApplication {
+                                    addApplication()
+                                }
+                            }
                     } header: {
                         Text("Bewerbung")
                     } footer: {
@@ -154,6 +166,9 @@ struct ApplicationsView: View {
                         .disabled(!viewModel.canAddApplication)
                     }
                 }
+                .onAppear {
+                    isCompanyFieldFocused = true
+                }
             }
         }
         .alert("Aktion fehlgeschlagen", isPresented: Binding(
@@ -169,6 +184,7 @@ struct ApplicationsView: View {
     private func addApplication() {
         do {
             try viewModel.addApplication(using: modelContext)
+            isCompanyFieldFocused = false
         } catch {
             errorMessage = "Die Bewerbung konnte nicht erstellt werden."
         }
