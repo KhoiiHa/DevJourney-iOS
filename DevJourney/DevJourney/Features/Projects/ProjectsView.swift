@@ -15,6 +15,19 @@ struct ProjectsView: View {
     @State private var errorMessage: String?
     @State private var searchText = ""
 
+    private var sortedProjects: [PortfolioProject] {
+        projects.sorted { firstProject, secondProject in
+            let firstPriority = priority(for: firstProject.status)
+            let secondPriority = priority(for: secondProject.status)
+
+            if firstPriority == secondPriority {
+                return firstProject.createdAt > secondProject.createdAt
+            }
+
+            return firstPriority < secondPriority
+        }
+    }
+
     var body: some View {
         List {
             if projects.isEmpty {
@@ -153,15 +166,16 @@ struct ProjectsView: View {
 
     private var filteredProjects: [PortfolioProject] {
         guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            return projects
+            return sortedProjects
         }
 
-        return projects.filter { project in
+        return sortedProjects.filter { project in
             project.title.localizedStandardContains(searchText) ||
             project.summary.localizedStandardContains(searchText) ||
             project.githubURL.localizedStandardContains(searchText)
         }
     }
+
     private var isSearching: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -174,6 +188,17 @@ struct ProjectsView: View {
             return .green
         default:
             return .secondary
+        }
+    }
+
+    private func priority(for status: String) -> Int {
+        switch status {
+        case PortfolioProjectStatus.inProgress:
+            return 0
+        case PortfolioProjectStatus.completed:
+            return 2
+        default:
+            return 1
         }
     }
 
