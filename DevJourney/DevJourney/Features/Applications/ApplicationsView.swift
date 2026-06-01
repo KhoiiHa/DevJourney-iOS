@@ -12,6 +12,7 @@ struct ApplicationsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \JobApplication.createdAt, order: .reverse) private var applications: [JobApplication]
     @State private var viewModel = ApplicationsViewModel()
+    @State private var errorMessage: String?
 
     var body: some View {
         List {
@@ -34,13 +35,13 @@ struct ApplicationsView: View {
                         Section(status) {
                             ForEach(applicationsForStatus) { application in
                                 applicationRow(for: application)
-                            }
-                            .onDelete { offsets in
-                                viewModel.deleteApplications(
-                                    at: offsets,
-                                    from: applicationsForStatus,
-                                    using: modelContext
-                                )
+                                    .swipeActions(edge: .trailing) {
+                                        Button(role: .destructive) {
+                                            deleteApplication(application)
+                                        } label: {
+                                            Label("Löschen", systemImage: "trash")
+                                        }
+                                    }
                             }
                         }
                     }
@@ -118,6 +119,15 @@ struct ApplicationsView: View {
                 }
             }
         }
+        }
+        .alert("Aktion fehlgeschlagen", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage ?? "Bitte versuche es erneut.")
+        }
     }
 
     private func applicationRow(for application: JobApplication) -> some View {
@@ -157,3 +167,13 @@ struct ApplicationsView: View {
     }
     .modelContainer(for: JobApplication.self, inMemory: true)
 }
+
+    private func deleteApplication(_ application: JobApplication) {
+        modelContext.delete(application)
+
+        do {
+            try modelContext.save()
+        } catch {
+            errorMessage = "Die Bewerbung konnte nicht gelöscht werden."
+        }
+    }
