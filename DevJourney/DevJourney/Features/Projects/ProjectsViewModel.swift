@@ -36,7 +36,7 @@ final class ProjectsViewModel {
         resetForm()
     }
 
-    func addProject(using modelContext: ModelContext) {
+    func addProject(using modelContext: ModelContext) throws {
         guard canAddProject else {
             return
         }
@@ -49,6 +49,7 @@ final class ProjectsViewModel {
             status: newProjectStatus
         )
         modelContext.insert(project)
+        try modelContext.save()
         resetForm()
     }
 
