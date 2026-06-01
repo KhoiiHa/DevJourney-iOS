@@ -13,6 +13,19 @@ struct ApplicationsView: View {
     @Query(sort: \JobApplication.createdAt, order: .reverse) private var applications: [JobApplication]
     @State private var viewModel = ApplicationsViewModel()
     @State private var errorMessage: String?
+    @State private var searchText = ""
+
+    private var filteredApplications: [JobApplication] {
+        guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return applications
+        }
+
+        return applications.filter { application in
+            application.companyName.localizedStandardContains(searchText) ||
+            application.positionTitle.localizedStandardContains(searchText) ||
+            application.jobURL.localizedStandardContains(searchText)
+        }
+    }
 
     var body: some View {
         List {
@@ -29,7 +42,7 @@ struct ApplicationsView: View {
                 }
             } else {
                 ForEach(viewModel.availableStatuses, id: \.self) { status in
-                    let applicationsForStatus = applications.filter { $0.status == status }
+                    let applicationsForStatus = filteredApplications.filter { $0.status == status }
 
                     if !applicationsForStatus.isEmpty {
                         Section(status) {
@@ -51,6 +64,7 @@ struct ApplicationsView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("Bewerbungen")
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(text: $searchText, prompt: "Bewerbungen suchen")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -112,13 +126,12 @@ struct ApplicationsView: View {
 
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Speichern") {
-                            viewModel.addApplication(using: modelContext)
+                            addApplication()
                         }
                         .disabled(!viewModel.canAddApplication)
                     }
                 }
             }
-        }
         }
         .alert("Aktion fehlgeschlagen", isPresented: Binding(
             get: { errorMessage != nil },
@@ -127,6 +140,14 @@ struct ApplicationsView: View {
             Button("OK", role: .cancel) { }
         } message: {
             Text(errorMessage ?? "Bitte versuche es erneut.")
+        }
+    }
+
+    private func addApplication() {
+        do {
+            try viewModel.addApplication(using: modelContext)
+        } catch {
+            errorMessage = "Die Bewerbung konnte nicht erstellt werden."
         }
     }
 
@@ -159,14 +180,6 @@ struct ApplicationsView: View {
             .padding(.vertical, 4)
         }
     }
-}
-
-#Preview {
-    NavigationStack {
-        ApplicationsView()
-    }
-    .modelContainer(for: JobApplication.self, inMemory: true)
-}
 
     private func deleteApplication(_ application: JobApplication) {
         modelContext.delete(application)
@@ -177,3 +190,11 @@ struct ApplicationsView: View {
             errorMessage = "Die Bewerbung konnte nicht gelöscht werden."
         }
     }
+}
+
+#Preview {
+    NavigationStack {
+        ApplicationsView()
+    }
+    .modelContainer(for: JobApplication.self, inMemory: true)
+}
