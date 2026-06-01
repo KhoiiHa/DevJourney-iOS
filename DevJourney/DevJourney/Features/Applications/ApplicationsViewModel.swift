@@ -49,7 +49,7 @@ final class ApplicationsViewModel {
         resetForm()
     }
 
-    func addApplication(using modelContext: ModelContext) {
+    func addApplication(using modelContext: ModelContext) throws {
         guard canAddApplication else {
             return
         }
@@ -62,6 +62,7 @@ final class ApplicationsViewModel {
             appliedAt: hasAppliedDate ? appliedAt : nil
         )
         modelContext.insert(application)
+        try modelContext.save()
         resetForm()
     }
 
