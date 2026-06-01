@@ -12,6 +12,7 @@ struct ProjectsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \PortfolioProject.createdAt, order: .reverse) private var projects: [PortfolioProject]
     @State private var viewModel = ProjectsViewModel()
+    @State private var errorMessage: String?
 
     var body: some View {
         List {
@@ -53,9 +54,13 @@ struct ProjectsView: View {
                         }
                     }
                     .padding(.vertical, 4)
-                }
-                .onDelete { offsets in
-                    viewModel.deleteProjects(at: offsets, from: projects, using: modelContext)
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            deleteProject(project)
+                        } label: {
+                            Label("Löschen", systemImage: "trash")
+                        }
+                    }
                 }
             }
         }
@@ -124,6 +129,24 @@ struct ProjectsView: View {
                     }
                 }
             }
+        }
+        .alert("Aktion fehlgeschlagen", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage ?? "Bitte versuche es erneut.")
+        }
+    }
+
+    private func deleteProject(_ project: PortfolioProject) {
+        modelContext.delete(project)
+
+        do {
+            try modelContext.save()
+        } catch {
+            errorMessage = "Das Projekt konnte nicht gelöscht werden."
         }
     }
 }
