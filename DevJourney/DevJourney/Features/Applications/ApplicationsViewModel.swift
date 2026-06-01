@@ -66,11 +66,6 @@ final class ApplicationsViewModel {
         resetForm()
     }
 
-    func deleteApplications(at offsets: IndexSet, from applications: [JobApplication], using modelContext: ModelContext) {
-        for index in offsets {
-            modelContext.delete(applications[index])
-        }
-    }
 
     private func resetForm() {
         companyName = ""
