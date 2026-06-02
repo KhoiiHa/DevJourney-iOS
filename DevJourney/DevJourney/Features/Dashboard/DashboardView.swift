@@ -54,7 +54,8 @@ struct DashboardView: View {
                 DashboardFocusItem(
                     title: "Offene Lernziele prüfen",
                     subtitle: "Du hast \(openGoalsCount) offene Lernziele.",
-                    systemImage: "target"
+                    systemImage: "target",
+                    destination: .goals
                 )
             )
         }
@@ -64,7 +65,8 @@ struct DashboardView: View {
                 DashboardFocusItem(
                     title: "Aktive Projekte weiterbringen",
                     subtitle: "\(activeProjectsCount) Projekte sind aktuell in Bearbeitung.",
-                    systemImage: "folder"
+                    systemImage: "folder",
+                    destination: .projects
                 )
             )
         }
@@ -74,7 +76,8 @@ struct DashboardView: View {
                 DashboardFocusItem(
                     title: "Interviews vorbereiten",
                     subtitle: "\(interviewApplicationsCount) Bewerbungen sind im Interview-Status.",
-                    systemImage: "person.text.rectangle"
+                    systemImage: "person.text.rectangle",
+                    destination: .applications
                 )
             )
         }
@@ -84,7 +87,8 @@ struct DashboardView: View {
                 DashboardFocusItem(
                     title: "Fortschritt prüfen",
                     subtitle: "Deine Daten sind aktuell ruhig. Nutze den Schnellzugriff für den nächsten Schritt.",
-                    systemImage: "checkmark.seal"
+                    systemImage: "checkmark.seal",
+                    destination: .goals
                 )
             )
         }
@@ -229,10 +233,29 @@ struct DashboardView: View {
     }
 }
 
+private enum DashboardFocusDestination {
+    case goals
+    case projects
+    case applications
+
+    @ViewBuilder
+    var view: some View {
+        switch self {
+        case .goals:
+            GoalsView()
+        case .projects:
+            ProjectsView()
+        case .applications:
+            ApplicationsView()
+        }
+    }
+}
+
 private struct DashboardFocusItem: Identifiable {
     let title: String
     let subtitle: String
     let systemImage: String
+    let destination: DashboardFocusDestination
 
     var id: String {
         title
@@ -260,26 +283,35 @@ private struct DashboardFocusRow: View {
     let item: DashboardFocusItem
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: item.systemImage)
-                .font(.title3)
-                .foregroundStyle(.secondary)
-                .frame(width: 28)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(item.title)
-                    .font(.subheadline.weight(.semibold))
-
-                Text(item.subtitle)
-                    .font(.caption)
+        NavigationLink {
+            item.destination.view
+        } label: {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: item.systemImage)
+                    .font(.title3)
                     .foregroundStyle(.secondary)
-            }
+                    .frame(width: 28)
 
-            Spacer()
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(item.title)
+                        .font(.subheadline.weight(.semibold))
+
+                    Text(item.subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(14)
+            .background(.thinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
         }
-        .padding(14)
-        .background(.thinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .buttonStyle(.plain)
     }
 }
 
