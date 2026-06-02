@@ -15,6 +15,7 @@ struct GoalDetailView: View {
     let goal: LearningGoal
     @State private var viewModel: GoalDetailViewModel
     @State private var isShowingDeleteConfirmation = false
+    @State private var errorMessage: String?
 
     init(goal: LearningGoal) {
         self.goal = goal
@@ -28,6 +29,7 @@ struct GoalDetailView: View {
 
                 TextField("Details", text: $viewModel.details, axis: .vertical)
                     .lineLimit(3...8)
+                    .submitLabel(.done)
             } header: {
                 Text("Lernziel")
             } footer: {
@@ -39,6 +41,18 @@ struct GoalDetailView: View {
 
             Section("Status") {
                 Toggle("Erledigt", isOn: $viewModel.isCompleted)
+            }
+
+            Section("Übersicht") {
+                StatusBadgeView(
+                    title: viewModel.isCompleted ? "Erledigt" : "Offen",
+                    color: viewModel.isCompleted ? .green : .secondary
+                )
+
+                if viewModel.hasTargetDate {
+                    Label("Ziel: \(viewModel.targetDate, style: .date)", systemImage: "calendar")
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Section("Zieldatum") {
@@ -64,16 +78,13 @@ struct GoalDetailView: View {
 
             ToolbarItem(placement: .confirmationAction) {
                 Button("Speichern") {
-                    viewModel.save(to: goal)
-                    try? modelContext.save()
-                    dismiss()
+                    saveGoal()
                 }
                 .disabled(!viewModel.canSave)
             }
         }
         .onChange(of: viewModel.isCompleted) { _, _ in
-            viewModel.updateCompletion(on: goal)
-            try? modelContext.save()
+            updateGoalCompletion()
         }
         .confirmationDialog(
             "Lernziel löschen?",
@@ -81,11 +92,18 @@ struct GoalDetailView: View {
             titleVisibility: .visible
         ) {
             Button("Löschen", role: .destructive) {
-                modelContext.delete(goal)
-                dismiss()
+                deleteGoal()
             }
         } message: {
             Text("Diese Aktion kann nicht rückgängig gemacht werden.")
+        }
+        .alert("Aktion fehlgeschlagen", isPresented: Binding(
+            get: { errorMessage != nil },
+            set: { if !$0 { errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage ?? "Bitte versuche es erneut.")
         }
     }
 }
@@ -95,3 +113,35 @@ struct GoalDetailView: View {
         GoalDetailView(goal: LearningGoal(title: "SwiftData verstehen"))
     }
 }
+
+    private func saveGoal() {
+        viewModel.save(to: goal)
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            errorMessage = "Das Lernziel konnte nicht gespeichert werden."
+        }
+    }
+
+    private func updateGoalCompletion() {
+        viewModel.updateCompletion(on: goal)
+
+        do {
+            try modelContext.save()
+        } catch {
+            errorMessage = "Der Lernziel-Status konnte nicht gespeichert werden."
+        }
+    }
+
+    private func deleteGoal() {
+        modelContext.delete(goal)
+
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            errorMessage = "Das Lernziel konnte nicht gelöscht werden."
+        }
+    }
