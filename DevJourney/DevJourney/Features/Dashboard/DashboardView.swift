@@ -172,6 +172,7 @@ struct DashboardView: View {
 
                     if hasAnyContent {
                         DashboardFocusSection(items: focusItems)
+                            .transition(.move(edge: .top).combined(with: .opacity))
                     }
 
                     VStack(alignment: .leading, spacing: 8) {
@@ -226,6 +227,10 @@ struct DashboardView: View {
                 }
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
+                .animation(.smooth, value: openGoalsCount)
+                .animation(.smooth, value: completedGoalsCount)
+                .animation(.smooth, value: projectsCount)
+                .animation(.smooth, value: applicationsCount)
             }
             .navigationTitle("Dashboard")
             .navigationBarTitleDisplayMode(.inline)
@@ -419,6 +424,7 @@ private struct DashboardStatusView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("\(value)")
                 .font(.headline)
+                .contentTransition(.numericText())
 
             StatusBadgeView(title: title, color: color)
         }
@@ -476,6 +482,7 @@ private struct DashboardMetricView: View {
             Text("\(value)")
                 .font(.title3)
                 .fontWeight(.semibold)
+                .contentTransition(.numericText())
 
             Text(title)
                 .font(.caption)
