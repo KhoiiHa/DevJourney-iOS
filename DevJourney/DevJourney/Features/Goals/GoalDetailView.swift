@@ -106,13 +106,6 @@ struct GoalDetailView: View {
             Text(errorMessage ?? "Bitte versuche es erneut.")
         }
     }
-}
-
-#Preview {
-    NavigationStack {
-        GoalDetailView(goal: LearningGoal(title: "SwiftData verstehen"))
-    }
-}
 
     private func saveGoal() {
         viewModel.save(to: goal)
@@ -145,3 +138,10 @@ struct GoalDetailView: View {
             errorMessage = "Das Lernziel konnte nicht gelöscht werden."
         }
     }
+}
+
+#Preview {
+    NavigationStack {
+        GoalDetailView(goal: LearningGoal(title: "SwiftData verstehen"))
+    }
+}
