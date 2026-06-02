@@ -32,6 +32,7 @@ struct ProjectDetailView: View {
 
                 TextField("GitHub-Link", text: $viewModel.githubURL)
                     .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
                     .keyboardType(.URL)
             } header: {
                 Text("Projekt")
@@ -51,6 +52,14 @@ struct ProjectDetailView: View {
                 Picker("Status", selection: $viewModel.status) {
                     ForEach(viewModel.availableStatuses, id: \.self) { status in
                         Text(status)
+                    }
+                }
+            }
+            
+            if let githubURL = validGitHubURL {
+                Section("Link") {
+                    Link(destination: githubURL) {
+                        Label("GitHub öffnen", systemImage: "link")
                     }
                 }
             }
@@ -91,6 +100,12 @@ struct ProjectDetailView: View {
             Text(errorMessage ?? "Bitte versuche es erneut.")
         }
     }
+
+    private var validGitHubURL: URL? {
+        let trimmedURL = viewModel.githubURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        return URL(string: trimmedURL)
+    }
+
     private func saveProject() {
         viewModel.save(to: project)
 
