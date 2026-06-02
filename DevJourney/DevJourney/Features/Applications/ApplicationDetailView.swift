@@ -30,6 +30,7 @@ struct ApplicationDetailView: View {
 
                 TextField("Stellenanzeige-Link", text: $viewModel.jobURL)
                     .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
                     .keyboardType(.URL)
             } header: {
                 Text("Bewerbung")
@@ -44,6 +45,14 @@ struct ApplicationDetailView: View {
                 Picker("Status", selection: $viewModel.status) {
                     ForEach(viewModel.availableStatuses, id: \.self) { status in
                         Text(status)
+                    }
+                }
+            }
+
+            if let jobURL = validJobURL {
+                Section("Link") {
+                    Link(destination: jobURL) {
+                        Label("Stellenanzeige öffnen", systemImage: "link")
                     }
                 }
             }
@@ -95,6 +104,11 @@ struct ApplicationDetailView: View {
         } message: {
             Text(errorMessage ?? "Bitte versuche es erneut.")
         }
+    }
+
+    private var validJobURL: URL? {
+        let trimmedURL = viewModel.jobURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        return URL(string: trimmedURL)
     }
 
     private func saveApplication() {
