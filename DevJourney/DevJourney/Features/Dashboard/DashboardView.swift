@@ -38,6 +38,60 @@ struct DashboardView: View {
         openGoalsCount > 0 || completedGoalsCount > 0 || projectsCount > 0 || applicationsCount > 0
     }
 
+    private var activeProjectsCount: Int {
+        projects.filter { $0.status == PortfolioProjectStatus.inProgress }.count
+    }
+
+    private var interviewApplicationsCount: Int {
+        applications.filter { $0.status == JobApplicationStatus.interview }.count
+    }
+
+    private var focusItems: [DashboardFocusItem] {
+        var items: [DashboardFocusItem] = []
+
+        if openGoalsCount > 0 {
+            items.append(
+                DashboardFocusItem(
+                    title: "Offene Lernziele prüfen",
+                    subtitle: "Du hast \(openGoalsCount) offene Lernziele.",
+                    systemImage: "target"
+                )
+            )
+        }
+
+        if activeProjectsCount > 0 {
+            items.append(
+                DashboardFocusItem(
+                    title: "Aktive Projekte weiterbringen",
+                    subtitle: "\(activeProjectsCount) Projekte sind aktuell in Bearbeitung.",
+                    systemImage: "folder"
+                )
+            )
+        }
+
+        if interviewApplicationsCount > 0 {
+            items.append(
+                DashboardFocusItem(
+                    title: "Interviews vorbereiten",
+                    subtitle: "\(interviewApplicationsCount) Bewerbungen sind im Interview-Status.",
+                    systemImage: "person.text.rectangle"
+                )
+            )
+        }
+
+        if items.isEmpty && hasAnyContent {
+            items.append(
+                DashboardFocusItem(
+                    title: "Fortschritt prüfen",
+                    subtitle: "Deine Daten sind aktuell ruhig. Nutze den Schnellzugriff für den nächsten Schritt.",
+                    systemImage: "checkmark.seal"
+                )
+            )
+        }
+
+        return items
+    }
+
     private var applicationStatusChartData: [DashboardChartValue] {
         JobApplicationStatus.all.map { status in
             DashboardChartValue(
@@ -112,6 +166,10 @@ struct DashboardView: View {
                         DashboardFirstRunView()
                     }
 
+                    if hasAnyContent {
+                        DashboardFocusSection(items: focusItems)
+                    }
+
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Schnellzugriff")
                             .font(.headline)
@@ -168,6 +226,60 @@ struct DashboardView: View {
             .navigationTitle("Dashboard")
             .navigationBarTitleDisplayMode(.inline)
         }
+    }
+}
+
+private struct DashboardFocusItem: Identifiable {
+    let title: String
+    let subtitle: String
+    let systemImage: String
+
+    var id: String {
+        title
+    }
+}
+
+private struct DashboardFocusSection: View {
+    let items: [DashboardFocusItem]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Heute im Fokus")
+                .font(.headline)
+
+            VStack(spacing: 8) {
+                ForEach(items) { item in
+                    DashboardFocusRow(item: item)
+                }
+            }
+        }
+    }
+}
+
+private struct DashboardFocusRow: View {
+    let item: DashboardFocusItem
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: item.systemImage)
+                .font(.title3)
+                .foregroundStyle(.secondary)
+                .frame(width: 28)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(item.title)
+                    .font(.subheadline.weight(.semibold))
+
+                Text(item.subtitle)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+        }
+        .padding(14)
+        .background(.thinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }
 
