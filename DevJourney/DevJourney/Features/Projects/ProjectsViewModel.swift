@@ -21,11 +21,15 @@ final class ProjectsViewModel {
     let availableStatuses = PortfolioProjectStatus.all
 
     var canAddProject: Bool {
-        !trimmedTitle.isEmpty
+        !trimmedTitle.isEmpty && hasValidGitHubURL
     }
 
     var validationMessage: String? {
-        canAddProject ? nil : "Titel ist ein Pflichtfeld."
+        if trimmedTitle.isEmpty {
+            return "Titel ist ein Pflichtfeld."
+        }
+
+        return hasValidGitHubURL ? nil : "Bitte gib einen gültigen GitHub-Link ein."
     }
 
     func startAddingProject() {
@@ -80,6 +84,10 @@ final class ProjectsViewModel {
 
     private var trimmedGitHubURL: String {
         newProjectGitHubURL.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var hasValidGitHubURL: Bool {
+        trimmedGitHubURL.isEmpty || trimmedGitHubURL.webURL != nil
     }
 
     private var trimmedNotes: String {

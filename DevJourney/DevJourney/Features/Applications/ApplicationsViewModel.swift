@@ -22,7 +22,7 @@ final class ApplicationsViewModel {
     let availableStatuses = JobApplicationStatus.all
 
     var canAddApplication: Bool {
-        !trimmedCompanyName.isEmpty && !trimmedPositionTitle.isEmpty
+        !trimmedCompanyName.isEmpty && !trimmedPositionTitle.isEmpty && hasValidJobURL
     }
 
     var validationMessage: String? {
@@ -38,7 +38,11 @@ final class ApplicationsViewModel {
             return "Firma ist ein Pflichtfeld."
         }
 
-        return "Position ist ein Pflichtfeld."
+        if trimmedPositionTitle.isEmpty {
+            return "Position ist ein Pflichtfeld."
+        }
+
+        return hasValidJobURL ? nil : "Bitte gib einen gültigen Stellenanzeigen-Link ein."
     }
 
     func startAddingApplication() {
@@ -94,5 +98,9 @@ final class ApplicationsViewModel {
 
     private var trimmedJobURL: String {
         jobURL.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var hasValidJobURL: Bool {
+        trimmedJobURL.isEmpty || trimmedJobURL.webURL != nil
     }
 }

@@ -56,7 +56,7 @@ struct ProjectDetailView: View {
                 }
             }
             
-            if let githubURL = validGitHubURL {
+            if let githubURL = viewModel.validGitHubURL {
                 Section("Link") {
                     Link(destination: githubURL) {
                         Label("GitHub öffnen", systemImage: "link")
@@ -99,11 +99,6 @@ struct ProjectDetailView: View {
         } message: {
             Text(errorMessage ?? "Bitte versuche es erneut.")
         }
-    }
-
-    private var validGitHubURL: URL? {
-        let trimmedURL = viewModel.githubURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        return URL(string: trimmedURL)
     }
 
     private func saveProject() {

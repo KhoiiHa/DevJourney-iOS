@@ -20,7 +20,7 @@ final class ApplicationDetailViewModel {
     let availableStatuses = JobApplicationStatus.all
 
     var canSave: Bool {
-        !trimmedCompanyName.isEmpty && !trimmedPositionTitle.isEmpty
+        !trimmedCompanyName.isEmpty && !trimmedPositionTitle.isEmpty && hasValidJobURL
     }
 
     var validationMessage: String? {
@@ -36,7 +36,15 @@ final class ApplicationDetailViewModel {
             return "Firma ist ein Pflichtfeld."
         }
 
-        return "Position ist ein Pflichtfeld."
+        if trimmedPositionTitle.isEmpty {
+            return "Position ist ein Pflichtfeld."
+        }
+
+        return hasValidJobURL ? nil : "Bitte gib einen gültigen Stellenanzeigen-Link ein."
+    }
+
+    var validJobURL: URL? {
+        trimmedJobURL.webURL
     }
 
     init(application: JobApplication) {
@@ -70,5 +78,9 @@ final class ApplicationDetailViewModel {
 
     private var trimmedJobURL: String {
         jobURL.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var hasValidJobURL: Bool {
+        trimmedJobURL.isEmpty || validJobURL != nil
     }
 }

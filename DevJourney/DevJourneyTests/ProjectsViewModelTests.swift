@@ -5,6 +5,7 @@
 //  Created by Vu Minh Khoi Ha on 29.05.26.
 //
 
+import Foundation
 import SwiftData
 import Testing
 @testable import DevJourney
@@ -43,6 +44,23 @@ struct ProjectsViewModelTests {
         #expect(projects.first?.notes == "SwiftData persistence built")
     }
 
+    @Test func projectRequiresValidGitHubURLWhenProvided() {
+        let viewModel = ProjectsViewModel()
+        viewModel.newProjectTitle = "DevJourney"
+
+        #expect(viewModel.canAddProject == true)
+
+        viewModel.newProjectGitHubURL = "github.com/example/devjourney"
+
+        #expect(viewModel.canAddProject == false)
+        #expect(viewModel.validationMessage == "Bitte gib einen gültigen GitHub-Link ein.")
+
+        viewModel.newProjectGitHubURL = "https://github.com/example/devjourney"
+
+        #expect(viewModel.canAddProject == true)
+        #expect(viewModel.validationMessage == nil)
+    }
+
     @Test func projectDetailRequiresTitleAndSavesTrimmedValues() {
         let project = PortfolioProject(title: "DevJourney")
         let viewModel = ProjectDetailViewModel(project: project)
@@ -65,6 +83,21 @@ struct ProjectsViewModelTests {
         #expect(project.notes == "SwiftUI und SwiftData MVP")
         #expect(project.status == PortfolioProjectStatus.inProgress)
         #expect(viewModel.validationMessage == nil)
+    }
+
+    @Test func projectDetailExposesOnlyValidWebURL() {
+        let project = PortfolioProject(title: "DevJourney")
+        let viewModel = ProjectDetailViewModel(project: project)
+
+        viewModel.githubURL = "ftp://github.com/example/devjourney"
+
+        #expect(viewModel.canSave == false)
+        #expect(viewModel.validGitHubURL == nil)
+
+        viewModel.githubURL = " https://github.com/example/devjourney "
+
+        #expect(viewModel.canSave == true)
+        #expect(viewModel.validGitHubURL?.absoluteString == "https://github.com/example/devjourney")
     }
 
 }

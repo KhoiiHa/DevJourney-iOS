@@ -19,11 +19,19 @@ final class ProjectDetailViewModel {
     let availableStatuses = PortfolioProjectStatus.all
 
     var canSave: Bool {
-        !trimmedTitle.isEmpty
+        !trimmedTitle.isEmpty && hasValidGitHubURL
     }
 
     var validationMessage: String? {
-        canSave ? nil : "Titel ist ein Pflichtfeld."
+        if trimmedTitle.isEmpty {
+            return "Titel ist ein Pflichtfeld."
+        }
+
+        return hasValidGitHubURL ? nil : "Bitte gib einen gültigen GitHub-Link ein."
+    }
+
+    var validGitHubURL: URL? {
+        trimmedGitHubURL.webURL
     }
 
     init(project: PortfolioProject) {
@@ -56,6 +64,10 @@ final class ProjectDetailViewModel {
 
     private var trimmedGitHubURL: String {
         githubURL.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var hasValidGitHubURL: Bool {
+        trimmedGitHubURL.isEmpty || validGitHubURL != nil
     }
 
     private var trimmedNotes: String {

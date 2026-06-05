@@ -51,6 +51,24 @@ struct ApplicationsViewModelTests {
         #expect(applications.first?.jobURL == "https://jobs.apple.com/example")
     }
 
+    @Test func applicationRequiresValidJobURLWhenProvided() {
+        let viewModel = ApplicationsViewModel()
+        viewModel.companyName = "Apple"
+        viewModel.positionTitle = "iOS Developer"
+
+        #expect(viewModel.canAddApplication == true)
+
+        viewModel.jobURL = "jobs.apple.com/example"
+
+        #expect(viewModel.canAddApplication == false)
+        #expect(viewModel.validationMessage == "Bitte gib einen gültigen Stellenanzeigen-Link ein.")
+
+        viewModel.jobURL = "https://jobs.apple.com/example"
+
+        #expect(viewModel.canAddApplication == true)
+        #expect(viewModel.validationMessage == nil)
+    }
+
     @Test func applicationDetailRequiresCompanyAndPositionAndSavesTrimmedValues() {
         let date = Date()
         let application = JobApplication(
@@ -78,6 +96,24 @@ struct ApplicationsViewModelTests {
         #expect(application.status == JobApplicationStatus.interview)
         #expect(application.appliedAt == nil)
         #expect(viewModel.validationMessage == nil)
+    }
+
+    @Test func applicationDetailExposesOnlyValidWebURL() {
+        let application = JobApplication(
+            companyName: "Apple",
+            positionTitle: "iOS Developer"
+        )
+        let viewModel = ApplicationDetailViewModel(application: application)
+
+        viewModel.jobURL = "mailto:jobs@example.com"
+
+        #expect(viewModel.canSave == false)
+        #expect(viewModel.validJobURL == nil)
+
+        viewModel.jobURL = " https://jobs.apple.com/example "
+
+        #expect(viewModel.canSave == true)
+        #expect(viewModel.validJobURL?.absoluteString == "https://jobs.apple.com/example")
     }
 
 }

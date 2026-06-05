@@ -49,7 +49,7 @@ struct ApplicationDetailView: View {
                 }
             }
 
-            if let jobURL = validJobURL {
+            if let jobURL = viewModel.validJobURL {
                 Section("Link") {
                     Link(destination: jobURL) {
                         Label("Stellenanzeige öffnen", systemImage: "link")
@@ -104,11 +104,6 @@ struct ApplicationDetailView: View {
         } message: {
             Text(errorMessage ?? "Bitte versuche es erneut.")
         }
-    }
-
-    private var validJobURL: URL? {
-        let trimmedURL = viewModel.jobURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        return URL(string: trimmedURL)
     }
 
     private func saveApplication() {
