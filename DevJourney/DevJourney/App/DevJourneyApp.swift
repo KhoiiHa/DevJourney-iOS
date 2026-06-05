@@ -20,19 +20,20 @@ struct DevJourneyApp: App {
     }
 
     private static func makeModelContainer() -> ModelContainer {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--reset-store") {
+            do {
+                try resetPersistentStore()
+            } catch {
+                fatalError("Could not reset persistent store: \(error)")
+            }
+        }
+        #endif
+
         do {
             return try createModelContainer()
         } catch {
-            #if DEBUG
-            do {
-                try resetPersistentStore()
-                return try createModelContainer()
-            } catch {
-                fatalError("Could not recreate ModelContainer after resetting local store: \(error)")
-            }
-            #else
-            fatalError("Could not create ModelContainer: \(error)")
-            #endif
+            fatalError("Could not create ModelContainer without deleting existing data: \(error)")
         }
     }
 
@@ -82,8 +83,8 @@ struct DevJourneyApp: App {
 
         let storeFiles = [
             storeURL,
-            storeURL.appendingPathExtension("shm"),
-            storeURL.appendingPathExtension("wal")
+            URL(filePath: storeURL.path + "-shm"),
+            URL(filePath: storeURL.path + "-wal")
         ]
 
         let fileManager = FileManager.default
