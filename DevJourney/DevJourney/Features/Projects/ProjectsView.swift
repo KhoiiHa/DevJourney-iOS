@@ -178,19 +178,23 @@ struct ProjectsView: View {
     }
 
     private var filteredProjects: [PortfolioProject] {
-        guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        guard !normalizedSearchText.isEmpty else {
             return sortedProjects
         }
 
         return sortedProjects.filter { project in
-            project.title.localizedStandardContains(searchText) ||
-            project.summary.localizedStandardContains(searchText) ||
-            project.githubURL.localizedStandardContains(searchText)
+            project.title.localizedStandardContains(normalizedSearchText) ||
+            project.summary.localizedStandardContains(normalizedSearchText) ||
+            project.githubURL.localizedStandardContains(normalizedSearchText)
         }
     }
 
     private var isSearching: Bool {
-        !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !normalizedSearchText.isEmpty
+    }
+
+    private var normalizedSearchText: String {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func color(for status: String) -> Color {

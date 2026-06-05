@@ -23,17 +23,21 @@ struct GoalsView: View {
     }
 
     private var filteredGoals: [LearningGoal] {
-        guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        guard !normalizedSearchText.isEmpty else {
             return sortedGoals
         }
 
         return sortedGoals.filter { goal in
-            goal.title.localizedStandardContains(searchText)
+            goal.title.localizedStandardContains(normalizedSearchText)
         }
     }
 
     private var isSearching: Bool {
-        !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !normalizedSearchText.isEmpty
+    }
+
+    private var normalizedSearchText: String {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private var openGoals: [LearningGoal] {

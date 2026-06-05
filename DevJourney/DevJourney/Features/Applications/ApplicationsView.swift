@@ -30,19 +30,33 @@ struct ApplicationsView: View {
     }
 
     private var filteredApplications: [JobApplication] {
-        guard !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+        guard !normalizedSearchText.isEmpty else {
             return sortedApplications
         }
 
         return sortedApplications.filter { application in
-            application.companyName.localizedStandardContains(searchText) ||
-            application.positionTitle.localizedStandardContains(searchText) ||
-            application.jobURL.localizedStandardContains(searchText)
+            application.companyName.localizedStandardContains(normalizedSearchText) ||
+            application.positionTitle.localizedStandardContains(normalizedSearchText) ||
+            application.jobURL.localizedStandardContains(normalizedSearchText)
         }
     }
 
     private var isSearching: Bool {
-        !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !normalizedSearchText.isEmpty
+    }
+
+    private var normalizedSearchText: String {
+        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var orderedStatuses: [String] {
+        [
+            JobApplicationStatus.interview,
+            JobApplicationStatus.applied,
+            JobApplicationStatus.open,
+            JobApplicationStatus.offer,
+            JobApplicationStatus.rejected
+        ]
     }
 
     var body: some View {
@@ -65,7 +79,7 @@ struct ApplicationsView: View {
                     Text("Passe deinen Suchbegriff an oder lege eine neue Bewerbung an.")
                 }
             } else {
-                ForEach(viewModel.availableStatuses, id: \.self) { status in
+                ForEach(orderedStatuses, id: \.self) { status in
                     let applicationsForStatus = filteredApplications.filter { $0.status == status }
 
                     if !applicationsForStatus.isEmpty {
