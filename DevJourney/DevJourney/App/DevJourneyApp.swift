@@ -38,6 +38,18 @@ struct DevJourneyApp: App {
 
     private static func createModelContainer() throws -> ModelContainer {
         let schema = appSchema
+
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--ui-testing") {
+            let configuration = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: true
+            )
+
+            return try ModelContainer(for: schema, configurations: [configuration])
+        }
+        #endif
+
         try createStoreDirectoryIfNeeded()
 
         let configuration = ModelConfiguration(
