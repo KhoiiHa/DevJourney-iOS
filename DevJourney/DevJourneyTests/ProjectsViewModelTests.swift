@@ -36,7 +36,7 @@ struct ProjectsViewModelTests {
         viewModel.newProjectGitHubURL = " https://github.com/example/devjourney "
         viewModel.newProjectNotes = " SwiftData persistence built "
 
-        viewModel.addProject(using: container.mainContext)
+        try viewModel.addProject(using: container.mainContext)
 
         let projects = try container.mainContext.fetch(FetchDescriptor<PortfolioProject>())
         #expect(projects.first?.githubURL == "https://github.com/example/devjourney")

@@ -45,7 +45,7 @@ struct ApplicationsViewModelTests {
         viewModel.positionTitle = "iOS Developer"
         viewModel.jobURL = " https://jobs.apple.com/example "
 
-        viewModel.addApplication(using: container.mainContext)
+        try viewModel.addApplication(using: container.mainContext)
 
         let applications = try container.mainContext.fetch(FetchDescriptor<JobApplication>())
         #expect(applications.first?.jobURL == "https://jobs.apple.com/example")
