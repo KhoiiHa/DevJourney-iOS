@@ -118,6 +118,7 @@ struct ApplicationDetailView: View {
             try modelContext.save()
             dismiss()
         } catch {
+            modelContext.rollback()
             errorMessage = "Die Bewerbung konnte nicht gespeichert werden."
         }
     }
@@ -129,6 +130,7 @@ struct ApplicationDetailView: View {
             try modelContext.save()
             dismiss()
         } catch {
+            modelContext.rollback()
             errorMessage = "Die Bewerbung konnte nicht gelöscht werden."
         }
     }

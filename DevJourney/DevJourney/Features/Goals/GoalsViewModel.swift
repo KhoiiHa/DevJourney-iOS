@@ -37,7 +37,14 @@ final class GoalsViewModel {
 
         let goal = LearningGoal(title: trimmedTitle)
         modelContext.insert(goal)
-        try modelContext.save()
+
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
+
         resetForm()
     }
 

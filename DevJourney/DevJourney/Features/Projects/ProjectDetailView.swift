@@ -113,6 +113,7 @@ struct ProjectDetailView: View {
             try modelContext.save()
             dismiss()
         } catch {
+            modelContext.rollback()
             errorMessage = "Das Projekt konnte nicht gespeichert werden."
         }
     }
@@ -124,6 +125,7 @@ struct ProjectDetailView: View {
             try modelContext.save()
             dismiss()
         } catch {
+            modelContext.rollback()
             errorMessage = "Das Projekt konnte nicht gelöscht werden."
         }
     }

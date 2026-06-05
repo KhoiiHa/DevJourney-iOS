@@ -49,7 +49,14 @@ final class ProjectsViewModel {
             status: newProjectStatus
         )
         modelContext.insert(project)
-        try modelContext.save()
+
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
+
         resetForm()
     }
 

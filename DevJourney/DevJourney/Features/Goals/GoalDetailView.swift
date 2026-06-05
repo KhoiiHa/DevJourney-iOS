@@ -114,6 +114,7 @@ struct GoalDetailView: View {
             try modelContext.save()
             dismiss()
         } catch {
+            modelContext.rollback()
             errorMessage = "Das Lernziel konnte nicht gespeichert werden."
         }
     }
@@ -124,6 +125,7 @@ struct GoalDetailView: View {
         do {
             try modelContext.save()
         } catch {
+            modelContext.rollback()
             errorMessage = "Der Lernziel-Status konnte nicht gespeichert werden."
         }
     }
@@ -135,6 +137,7 @@ struct GoalDetailView: View {
             try modelContext.save()
             dismiss()
         } catch {
+            modelContext.rollback()
             errorMessage = "Das Lernziel konnte nicht gelöscht werden."
         }
     }

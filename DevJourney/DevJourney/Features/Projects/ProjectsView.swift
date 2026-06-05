@@ -230,6 +230,7 @@ struct ProjectsView: View {
         do {
             try modelContext.save()
         } catch {
+            modelContext.rollback()
             errorMessage = "Das Projekt konnte nicht gelöscht werden."
         }
     }

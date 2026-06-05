@@ -62,7 +62,14 @@ final class ApplicationsViewModel {
             appliedAt: hasAppliedDate ? appliedAt : nil
         )
         modelContext.insert(application)
-        try modelContext.save()
+
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
+
         resetForm()
     }
 

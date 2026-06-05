@@ -257,6 +257,7 @@ struct ApplicationsView: View {
         do {
             try modelContext.save()
         } catch {
+            modelContext.rollback()
             errorMessage = "Die Bewerbung konnte nicht gelöscht werden."
         }
     }
