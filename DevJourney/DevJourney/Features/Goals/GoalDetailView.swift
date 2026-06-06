@@ -83,9 +83,6 @@ struct GoalDetailView: View {
                 .disabled(!viewModel.canSave)
             }
         }
-        .onChange(of: viewModel.isCompleted) { _, _ in
-            updateGoalCompletion()
-        }
         .confirmationDialog(
             "Lernziel löschen?",
             isPresented: $isShowingDeleteConfirmation,
@@ -116,17 +113,6 @@ struct GoalDetailView: View {
         } catch {
             modelContext.rollback()
             errorMessage = "Das Lernziel konnte nicht gespeichert werden."
-        }
-    }
-
-    private func updateGoalCompletion() {
-        viewModel.updateCompletion(on: goal)
-
-        do {
-            try modelContext.save()
-        } catch {
-            modelContext.rollback()
-            errorMessage = "Der Lernziel-Status konnte nicht gespeichert werden."
         }
     }
 

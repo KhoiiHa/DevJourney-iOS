@@ -43,10 +43,6 @@ final class GoalDetailViewModel {
         goal.targetDate = hasTargetDate ? targetDate : nil
     }
 
-    func updateCompletion(on goal: LearningGoal) {
-        goal.isCompleted = isCompleted
-    }
-
     private var trimmedTitle: String {
         title.trimmingCharacters(in: .whitespacesAndNewlines)
     }

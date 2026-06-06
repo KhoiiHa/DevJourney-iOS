@@ -44,12 +44,15 @@ struct GoalsViewModelTests {
         #expect(viewModel.validationMessage == nil)
     }
 
-    @Test func goalDetailUpdatesCompletionImmediately() {
+    @Test func goalDetailKeepsCompletionChangeInViewModelUntilSave() {
         let goal = LearningGoal(title: "SwiftUI lernen")
         let viewModel = GoalDetailViewModel(goal: goal)
 
         viewModel.isCompleted = true
-        viewModel.updateCompletion(on: goal)
+
+        #expect(goal.isCompleted == false)
+
+        viewModel.save(to: goal)
 
         #expect(goal.isCompleted == true)
     }
