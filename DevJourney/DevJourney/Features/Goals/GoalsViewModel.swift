@@ -48,7 +48,6 @@ final class GoalsViewModel {
         resetForm()
     }
 
-
     func toggleCompletion(for goal: LearningGoal) {
         goal.isCompleted.toggle()
     }

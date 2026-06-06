@@ -64,7 +64,6 @@ final class ProjectsViewModel {
         resetForm()
     }
 
-
     private func resetForm() {
         newProjectTitle = ""
         newProjectSummary = ""

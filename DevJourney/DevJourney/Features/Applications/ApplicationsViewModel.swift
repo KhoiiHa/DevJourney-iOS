@@ -77,7 +77,6 @@ final class ApplicationsViewModel {
         resetForm()
     }
 
-
     private func resetForm() {
         companyName = ""
         positionTitle = ""
