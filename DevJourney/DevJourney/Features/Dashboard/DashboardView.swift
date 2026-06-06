@@ -104,7 +104,7 @@ struct DashboardView: View {
             )
         }
     }
-    
+
     private func color(forApplicationStatus status: String) -> Color {
         switch status {
         case JobApplicationStatus.applied:
@@ -204,12 +204,14 @@ struct DashboardView: View {
                     }
 
                     if applicationsCount > 0 {
+                        let chartData = applicationStatusChartData
+
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Bewerbungsstatus")
                                 .font(.headline)
 
                             LazyVGrid(columns: metricColumns, spacing: 12) {
-                                ForEach(applicationStatusChartData) { statusValue in
+                                ForEach(chartData) { statusValue in
                                     DashboardStatusView(
                                         title: statusValue.title,
                                         value: statusValue.value,
@@ -221,7 +223,7 @@ struct DashboardView: View {
 
                         DashboardBarChartView(
                             title: "Bewerbungen nach Status",
-                            values: applicationStatusChartData
+                            values: chartData
                         )
                     }
                 }
