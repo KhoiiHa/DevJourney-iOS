@@ -16,18 +16,12 @@ struct GoalsView: View {
     @State private var searchText = ""
     @FocusState private var isTitleFieldFocused: Bool
 
-    private var sortedGoals: [LearningGoal] {
-        goals.sorted { firstGoal, secondGoal in
-            firstGoal.createdAt > secondGoal.createdAt
-        }
-    }
-
     private var filteredGoals: [LearningGoal] {
         guard !normalizedSearchText.isEmpty else {
-            return sortedGoals
+            return goals
         }
 
-        return sortedGoals.filter { goal in
+        return goals.filter { goal in
             goal.title.localizedStandardContains(normalizedSearchText)
         }
     }
