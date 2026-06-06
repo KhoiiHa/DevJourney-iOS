@@ -34,6 +34,10 @@ final class ProjectDetailViewModel {
         trimmedGitHubURL.webURL
     }
 
+    var hasNotes: Bool {
+        !trimmedNotes.isEmpty
+    }
+
     init(project: PortfolioProject) {
         title = project.title
         summary = project.summary

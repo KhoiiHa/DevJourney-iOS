@@ -55,6 +55,23 @@ struct ProjectDetailView: View {
                     }
                 }
             }
+
+            Section("Übersicht") {
+                StatusBadgeView(
+                    title: viewModel.status,
+                    color: color(for: viewModel.status)
+                )
+
+                if viewModel.validGitHubURL != nil {
+                    Label("GitHub-Link vorhanden", systemImage: "link")
+                        .foregroundStyle(.secondary)
+                }
+
+                if viewModel.hasNotes {
+                    Label("Notizen vorhanden", systemImage: "note.text")
+                        .foregroundStyle(.secondary)
+                }
+            }
             
             if let githubURL = viewModel.validGitHubURL {
                 Section("Link") {
@@ -122,6 +139,17 @@ struct ProjectDetailView: View {
         } catch {
             modelContext.rollback()
             errorMessage = "Das Projekt konnte nicht gelöscht werden."
+        }
+    }
+
+    private func color(for status: String) -> Color {
+        switch status {
+        case PortfolioProjectStatus.inProgress:
+            return .blue
+        case PortfolioProjectStatus.completed:
+            return .green
+        default:
+            return .secondary
         }
     }
 }

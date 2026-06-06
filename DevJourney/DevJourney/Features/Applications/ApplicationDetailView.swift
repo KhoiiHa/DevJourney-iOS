@@ -49,6 +49,23 @@ struct ApplicationDetailView: View {
                 }
             }
 
+            Section("Übersicht") {
+                StatusBadgeView(
+                    title: viewModel.status,
+                    color: color(for: viewModel.status)
+                )
+
+                if viewModel.hasAppliedDate {
+                    Label("Seit \(viewModel.appliedAt, style: .date)", systemImage: "calendar")
+                        .foregroundStyle(.secondary)
+                }
+
+                if viewModel.validJobURL != nil {
+                    Label("Stellenanzeige vorhanden", systemImage: "link")
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             if let jobURL = viewModel.validJobURL {
                 Section("Link") {
                     Link(destination: jobURL) {
@@ -127,6 +144,19 @@ struct ApplicationDetailView: View {
         } catch {
             modelContext.rollback()
             errorMessage = "Die Bewerbung konnte nicht gelöscht werden."
+        }
+    }
+
+    private func color(for status: String) -> Color {
+        switch status {
+        case JobApplicationStatus.applied:
+            return .blue
+        case JobApplicationStatus.interview:
+            return .green
+        case JobApplicationStatus.rejected:
+            return .red
+        default:
+            return .secondary
         }
     }
 }
