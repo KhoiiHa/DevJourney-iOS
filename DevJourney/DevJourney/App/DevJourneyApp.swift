@@ -65,6 +65,7 @@ struct DevJourneyApp: App {
         Schema([
             LearningGoal.self,
             PortfolioProject.self,
+            ProjectMilestone.self,
             JobApplication.self,
         ])
     }
