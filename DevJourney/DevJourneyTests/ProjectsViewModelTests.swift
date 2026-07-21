@@ -100,4 +100,83 @@ struct ProjectsViewModelTests {
         #expect(viewModel.validGitHubURL?.absoluteString == "https://github.com/example/devjourney")
     }
 
+    @Test func readinessProgressCountsCompletedRequirements() {
+        let project = PortfolioProject(
+            title: "DevJourney",
+            isAppStable: true,
+            hasTests: true,
+            hasReadme: true
+        )
+
+        #expect(project.readinessCompletedCount == 3)
+        #expect(project.readinessTotalCount == 6)
+        #expect(project.readinessProgress == 0.5)
+        #expect(project.isPortfolioReady == false)
+    }
+
+    @Test func projectIsPortfolioReadyWhenEveryRequirementIsCompleted() {
+        let project = makePortfolioReadyProject()
+
+        #expect(project.readinessCompletedCount == project.readinessTotalCount)
+        #expect(project.readinessProgress == 1)
+        #expect(project.isPortfolioReady == true)
+    }
+
+    @Test func nextOpenStepUsesFirstOrderedMilestoneBeforeReadiness() {
+        let project = PortfolioProject(title: "DevJourney")
+        let appStoreText = ProjectMilestone(
+            title: "App Store Text vorbereiten",
+            sortOrder: 2
+        )
+        let screenshots = ProjectMilestone(
+            title: "Screenshots erstellen",
+            sortOrder: 1
+        )
+        project.milestones = [
+            appStoreText,
+            ProjectMilestone(title: "MVP abschließen", isCompleted: true, sortOrder: 0),
+            screenshots,
+        ]
+
+        #expect(project.nextOpenStepTitle == "Screenshots erstellen")
+
+        screenshots.isCompleted = true
+        appStoreText.isCompleted = true
+
+        #expect(project.nextOpenStepTitle == "App funktioniert stabil")
+    }
+
+    @Test func completedProjectHasNoOpenStep() {
+        let project = makePortfolioReadyProject()
+        project.milestones = [
+            ProjectMilestone(title: "MVP abschließen", isCompleted: true),
+        ]
+
+        #expect(project.nextOpenStepTitle == nil)
+        #expect(project.openActionCount == 0)
+    }
+
+    @Test func projectWithoutMilestonesUsesSafeReadinessDefaults() {
+        let project = PortfolioProject(title: "DevJourney")
+
+        #expect(project.milestones.isEmpty)
+        #expect(project.readinessCompletedCount == 0)
+        #expect(project.readinessProgress == 0)
+        #expect(project.isPortfolioReady == false)
+        #expect(project.nextOpenStepTitle == "App funktioniert stabil")
+        #expect(project.openActionCount == project.readinessTotalCount)
+    }
+
+    private func makePortfolioReadyProject() -> PortfolioProject {
+        PortfolioProject(
+            title: "DevJourney",
+            isAppStable: true,
+            hasTests: true,
+            hasReadme: true,
+            hasScreenshots: true,
+            hasAppIcon: true,
+            hasDocumentation: true
+        )
+    }
+
 }
