@@ -56,6 +56,100 @@ struct ProjectDetailView: View {
                 }
             }
 
+            Section {
+                if viewModel.orderedMilestones(for: project).isEmpty {
+                    Text("Noch keine Meilensteine")
+                        .foregroundStyle(.secondary)
+                } else {
+                    ForEach(viewModel.orderedMilestones(for: project)) { milestone in
+                        HStack(spacing: 12) {
+                            Button {
+                                toggleMilestone(milestone)
+                            } label: {
+                                Image(systemName: milestone.isCompleted ? "checkmark.circle.fill" : "circle")
+                                    .foregroundStyle(
+                                        milestone.isCompleted ? Color.green : Color.secondary
+                                    )
+                                    .font(.title3)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(
+                                milestone.isCompleted ? "Als offen markieren" : "Als erledigt markieren"
+                            )
+
+                            Text(milestone.title)
+                                .strikethrough(milestone.isCompleted)
+                                .foregroundStyle(milestone.isCompleted ? .secondary : .primary)
+
+                            Spacer()
+
+                            Button {
+                                viewModel.startEditingMilestone(milestone)
+                            } label: {
+                                Image(systemName: "pencil")
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("Meilenstein bearbeiten")
+                        }
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                deleteMilestone(milestone)
+                            } label: {
+                                Label("Löschen", systemImage: "trash")
+                            }
+                        }
+                    }
+                }
+
+                Button {
+                    viewModel.startAddingMilestone()
+                } label: {
+                    Label("Meilenstein hinzufügen", systemImage: "plus")
+                }
+            } header: {
+                Text("Meilensteine")
+            }
+
+            Section {
+                HStack {
+                    Text("Fortschritt")
+                    Spacer()
+                    Text(viewModel.readinessProgressText(for: project))
+                        .foregroundStyle(.secondary)
+                }
+
+                ProgressView(value: viewModel.readinessProgress(for: project))
+
+                ForEach(PortfolioReadinessRequirement.allCases) { requirement in
+                    Toggle(
+                        requirement.title,
+                        isOn: Binding(
+                            get: {
+                                viewModel.isReadinessRequirementCompleted(
+                                    requirement,
+                                    for: project
+                                )
+                            },
+                            set: { isCompleted in
+                                updateReadinessRequirement(
+                                    requirement,
+                                    isCompleted: isCompleted
+                                )
+                            }
+                        )
+                    )
+                }
+            } header: {
+                Text("Portfolio-Readiness")
+            } footer: {
+                if let nextStep = viewModel.nextOpenStepTitle(for: project) {
+                    Label("Als Nächstes: \(nextStep)", systemImage: "arrow.forward.circle")
+                } else {
+                    Label("Portfolio-bereit", systemImage: "checkmark.seal.fill")
+                        .foregroundStyle(.green)
+                }
+            }
+
             Section("Übersicht") {
                 StatusBadgeView(
                     title: viewModel.status,
@@ -108,6 +202,21 @@ struct ProjectDetailView: View {
         } message: {
             Text("Diese Aktion kann nicht rückgängig gemacht werden.")
         }
+        .alert(
+            viewModel.milestoneEditorTitle,
+            isPresented: $viewModel.isShowingMilestoneEditor
+        ) {
+            TextField("Titel", text: $viewModel.milestoneTitle)
+
+            Button("Abbrechen", role: .cancel) {
+                viewModel.cancelMilestoneEditing()
+            }
+
+            Button("Speichern") {
+                saveMilestone()
+            }
+            .disabled(!viewModel.canSaveMilestone)
+        }
         .alert("Aktion fehlgeschlagen", isPresented: Binding(
             get: { errorMessage != nil },
             set: { if !$0 { errorMessage = nil } }
@@ -142,6 +251,46 @@ struct ProjectDetailView: View {
         }
     }
 
+    private func saveMilestone() {
+        do {
+            try viewModel.saveMilestone(to: project, using: modelContext)
+        } catch {
+            errorMessage = "Der Meilenstein konnte nicht gespeichert werden."
+        }
+    }
+
+    private func toggleMilestone(_ milestone: ProjectMilestone) {
+        do {
+            try viewModel.toggleMilestone(milestone, using: modelContext)
+        } catch {
+            errorMessage = "Der Meilenstein konnte nicht aktualisiert werden."
+        }
+    }
+
+    private func deleteMilestone(_ milestone: ProjectMilestone) {
+        do {
+            try viewModel.deleteMilestone(milestone, using: modelContext)
+        } catch {
+            errorMessage = "Der Meilenstein konnte nicht gelöscht werden."
+        }
+    }
+
+    private func updateReadinessRequirement(
+        _ requirement: PortfolioReadinessRequirement,
+        isCompleted: Bool
+    ) {
+        do {
+            try viewModel.setReadinessRequirement(
+                requirement,
+                isCompleted: isCompleted,
+                for: project,
+                using: modelContext
+            )
+        } catch {
+            errorMessage = "Die Readiness-Checkliste konnte nicht aktualisiert werden."
+        }
+    }
+
     private func color(for status: String) -> Color {
         switch status {
         case PortfolioProjectStatus.inProgress:
@@ -158,4 +307,8 @@ struct ProjectDetailView: View {
     NavigationStack {
         ProjectDetailView(project: PortfolioProject(title: "DevJourney"))
     }
+    .modelContainer(
+        for: [PortfolioProject.self, ProjectMilestone.self],
+        inMemory: true
+    )
 }

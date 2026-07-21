@@ -167,6 +167,58 @@ struct ProjectsViewModelTests {
         #expect(project.openActionCount == project.readinessTotalCount)
     }
 
+    @MainActor
+    @Test func milestoneEditorAddsAndRenamesTrimmedMilestone() throws {
+        let container = try makeProjectContainer()
+        let project = PortfolioProject(title: "DevJourney")
+        container.mainContext.insert(project)
+        let viewModel = ProjectDetailViewModel(project: project)
+
+        viewModel.startAddingMilestone()
+        viewModel.milestoneTitle = "  "
+        #expect(viewModel.canSaveMilestone == false)
+
+        viewModel.milestoneTitle = "  Screenshots erstellen  "
+        try viewModel.saveMilestone(to: project, using: container.mainContext)
+
+        let milestone = try #require(project.milestones.first)
+        #expect(milestone.title == "Screenshots erstellen")
+        #expect(milestone.sortOrder == 0)
+        #expect(viewModel.isShowingMilestoneEditor == false)
+
+        viewModel.startEditingMilestone(milestone)
+        viewModel.milestoneTitle = "  App-Screenshots erstellen  "
+        try viewModel.saveMilestone(to: project, using: container.mainContext)
+
+        #expect(milestone.title == "App-Screenshots erstellen")
+    }
+
+    @MainActor
+    @Test func projectDetailPersistsMilestoneAndReadinessChanges() throws {
+        let container = try makeProjectContainer()
+        let project = PortfolioProject(title: "DevJourney")
+        let milestone = ProjectMilestone(title: "README schreiben")
+        project.milestones.append(milestone)
+        container.mainContext.insert(project)
+        let viewModel = ProjectDetailViewModel(project: project)
+
+        try viewModel.toggleMilestone(milestone, using: container.mainContext)
+        try viewModel.setReadinessRequirement(
+            .readme,
+            isCompleted: true,
+            for: project,
+            using: container.mainContext
+        )
+
+        #expect(milestone.isCompleted == true)
+        #expect(project.hasReadme == true)
+
+        try viewModel.deleteMilestone(milestone, using: container.mainContext)
+
+        let milestones = try container.mainContext.fetch(FetchDescriptor<ProjectMilestone>())
+        #expect(milestones.isEmpty)
+    }
+
     private func makePortfolioReadyProject() -> PortfolioProject {
         PortfolioProject(
             title: "DevJourney",
@@ -177,6 +229,19 @@ struct ProjectsViewModelTests {
             hasAppIcon: true,
             hasDocumentation: true
         )
+    }
+
+    @MainActor
+    private func makeProjectContainer() throws -> ModelContainer {
+        let schema = Schema([
+            PortfolioProject.self,
+            ProjectMilestone.self,
+        ])
+        let configuration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: true
+        )
+        return try ModelContainer(for: schema, configurations: [configuration])
     }
 
 }
