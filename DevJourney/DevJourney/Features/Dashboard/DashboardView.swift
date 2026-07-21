@@ -14,6 +14,8 @@ struct DashboardView: View {
     @Query private var projects: [PortfolioProject]
     @Query private var applications: [JobApplication]
 
+    private let viewModel = DashboardViewModel()
+
     private let metricColumns = [
         GridItem(.adaptive(minimum: 120), spacing: 12)
     ]
@@ -44,6 +46,10 @@ struct DashboardView: View {
 
     private var interviewApplicationsCount: Int {
         applications.filter { $0.status == JobApplicationStatus.interview }.count
+    }
+
+    private var portfolioSummary: DashboardPortfolioSummary {
+        viewModel.portfolioSummary(for: projects)
     }
 
     private var focusItems: [DashboardFocusItem] {
@@ -82,7 +88,7 @@ struct DashboardView: View {
             )
         }
 
-        if items.isEmpty && hasAnyContent {
+        if items.isEmpty && hasAnyContent && portfolioSummary.attentionProject == nil {
             items.append(
                 DashboardFocusItem(
                     title: "Fortschritt prüfen",
@@ -166,11 +172,15 @@ struct DashboardView: View {
                         }
                     }
 
+                    if projectsCount > 0 {
+                        DashboardPortfolioSection(summary: portfolioSummary)
+                    }
+
                     if !hasAnyContent {
                         DashboardFirstRunView()
                     }
 
-                    if hasAnyContent {
+                    if !focusItems.isEmpty {
                         DashboardFocusSection(items: focusItems)
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
@@ -236,6 +246,96 @@ struct DashboardView: View {
             }
             .navigationTitle("Dashboard")
             .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+private struct DashboardPortfolioSection: View {
+    let summary: DashboardPortfolioSummary
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Portfolio-Fokus")
+                .font(.headline)
+
+            NavigationLink {
+                ProjectsView()
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "checkmark.seal")
+                        .font(.title3)
+                        .foregroundStyle(.green)
+                        .frame(width: 28)
+
+                    Text("Portfolio-bereit")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Text("\(summary.readyProjectsCount)")
+                        .font(.headline)
+                        .contentTransition(.numericText())
+
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+                .padding(14)
+                .background(.thinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(.plain)
+
+            if let project = summary.attentionProject {
+                NavigationLink {
+                    ProjectDetailView(project: project)
+                } label: {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: "exclamationmark.circle")
+                            .font(.title3)
+                            .foregroundStyle(.orange)
+                            .frame(width: 28)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Braucht Aufmerksamkeit")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            Text(project.title)
+                                .font(.subheadline.weight(.semibold))
+
+                            Text("\(summary.attentionOpenActionCount) offene Punkte")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            if let nextStepTitle = summary.nextStepTitle {
+                                Label(
+                                    "Als Nächstes: \(nextStepTitle)",
+                                    systemImage: "arrow.forward.circle"
+                                )
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            }
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(14)
+                    .background(.thinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+            } else {
+                Label("Keine offenen Projektschritte", systemImage: "checkmark.circle.fill")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(14)
+                    .background(.thinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
         }
     }
 }
@@ -499,5 +599,13 @@ private struct DashboardMetricView: View {
 
 #Preview {
     DashboardView()
-        .modelContainer(for: [LearningGoal.self, PortfolioProject.self, JobApplication.self], inMemory: true)
+        .modelContainer(
+            for: [
+                LearningGoal.self,
+                PortfolioProject.self,
+                ProjectMilestone.self,
+                JobApplication.self,
+            ],
+            inMemory: true
+        )
 }
