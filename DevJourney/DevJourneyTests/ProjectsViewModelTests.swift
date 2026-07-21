@@ -219,6 +219,42 @@ struct ProjectsViewModelTests {
         #expect(milestones.isEmpty)
     }
 
+    @MainActor
+    @Test func milestoneOrderCanBeChangedAndControlsNextOpenStep() throws {
+        let container = try makeProjectContainer()
+        let project = PortfolioProject(title: "DevJourney")
+        project.milestones = [
+            ProjectMilestone(title: "MVP abschließen", sortOrder: 0),
+            ProjectMilestone(title: "README schreiben", sortOrder: 1),
+            ProjectMilestone(title: "Screenshots erstellen", sortOrder: 2),
+        ]
+        container.mainContext.insert(project)
+        try container.mainContext.save()
+        let viewModel = ProjectDetailViewModel(project: project)
+
+        try viewModel.moveMilestones(
+            fromOffsets: IndexSet(integer: 2),
+            toOffset: 0,
+            in: project,
+            using: container.mainContext
+        )
+
+        #expect(project.orderedMilestones.map(\.title) == [
+            "Screenshots erstellen",
+            "MVP abschließen",
+            "README schreiben",
+        ])
+        #expect(project.orderedMilestones.map(\.sortOrder) == [0, 1, 2])
+        #expect(project.nextOpenStepTitle == "Screenshots erstellen")
+
+        let persistedMilestones = try container.mainContext
+            .fetch(FetchDescriptor<ProjectMilestone>())
+            .sorted { $0.sortOrder < $1.sortOrder }
+        #expect(
+            persistedMilestones.map(\.title) == project.orderedMilestones.map(\.title)
+        )
+    }
+
     private func makePortfolioReadyProject() -> PortfolioProject {
         PortfolioProject(
             title: "DevJourney",

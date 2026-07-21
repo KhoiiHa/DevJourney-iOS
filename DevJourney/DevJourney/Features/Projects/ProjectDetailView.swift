@@ -16,6 +16,7 @@ struct ProjectDetailView: View {
     @State private var viewModel: ProjectDetailViewModel
     @State private var isShowingDeleteConfirmation = false
     @State private var errorMessage: String?
+    @State private var editMode: EditMode = .inactive
 
     init(project: PortfolioProject) {
         self.project = project
@@ -99,12 +100,28 @@ struct ProjectDetailView: View {
                             }
                         }
                     }
+                    .onMove(perform: moveMilestones)
                 }
 
                 Button {
                     viewModel.startAddingMilestone()
                 } label: {
                     Label("Meilenstein hinzufügen", systemImage: "plus")
+                }
+
+                if project.milestones.count > 1 {
+                    Button {
+                        withAnimation {
+                            editMode = editMode == .active ? .inactive : .active
+                        }
+                    } label: {
+                        Label(
+                            editMode == .active ? "Sortieren beenden" : "Reihenfolge ändern",
+                            systemImage: editMode == .active
+                                ? "checkmark"
+                                : "arrow.up.arrow.down"
+                        )
+                    }
                 }
             } header: {
                 Text("Meilensteine")
@@ -175,6 +192,7 @@ struct ProjectDetailView: View {
                 }
             }
         }
+        .environment(\.editMode, $editMode)
         .navigationTitle("Projekt")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -264,6 +282,19 @@ struct ProjectDetailView: View {
             try viewModel.toggleMilestone(milestone, using: modelContext)
         } catch {
             errorMessage = "Der Meilenstein konnte nicht aktualisiert werden."
+        }
+    }
+
+    private func moveMilestones(from source: IndexSet, to destination: Int) {
+        do {
+            try viewModel.moveMilestones(
+                fromOffsets: source,
+                toOffset: destination,
+                in: project,
+                using: modelContext
+            )
+        } catch {
+            errorMessage = "Die Reihenfolge konnte nicht gespeichert werden."
         }
     }
 

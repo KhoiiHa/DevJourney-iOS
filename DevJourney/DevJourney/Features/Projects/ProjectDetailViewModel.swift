@@ -142,6 +142,35 @@ final class ProjectDetailViewModel {
         try saveChanges(using: modelContext)
     }
 
+    func moveMilestones(
+        fromOffsets source: IndexSet,
+        toOffset destination: Int,
+        in project: PortfolioProject,
+        using modelContext: ModelContext
+    ) throws {
+        var milestones = orderedMilestones(for: project)
+        let validSource = IndexSet(source.filter { milestones.indices.contains($0) })
+        guard !validSource.isEmpty else { return }
+
+        let movedMilestones = validSource.map { milestones[$0] }
+        for index in validSource.reversed() {
+            milestones.remove(at: index)
+        }
+
+        let removedBeforeDestination = validSource.count { $0 < destination }
+        let insertionIndex = min(
+            max(destination - removedBeforeDestination, 0),
+            milestones.count
+        )
+        milestones.insert(contentsOf: movedMilestones, at: insertionIndex)
+
+        for (sortOrder, milestone) in milestones.enumerated() {
+            milestone.sortOrder = sortOrder
+        }
+
+        try saveChanges(using: modelContext)
+    }
+
     func deleteMilestone(
         _ milestone: ProjectMilestone,
         using modelContext: ModelContext

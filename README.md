@@ -14,7 +14,7 @@ Version 0.2 adds project milestones and a compact portfolio-readiness workflow w
 
 - Track learning goals with completion state and optional target date
 - Manage portfolio projects with status, description, notes, and optional GitHub link
-- Add, edit, complete, and delete ordered project milestones
+- Add, edit, reorder, complete, and delete project milestones
 - Review a fixed six-point portfolio-readiness checklist with progress
 - See the next open milestone or readiness requirement for every project
 - Identify portfolio-ready projects and the project with the most open work on the dashboard
@@ -92,4 +92,4 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild \
 
 DevJourney 0.2 is intentionally local and single-user. Cloud sync, authentication, AI prioritization, reminders, and exports remain out of scope.
 
-Possible next iterations are milestone reordering in the UI, broader accessibility regression coverage, and an explicit migration plan if the SwiftData schema grows beyond additive changes with safe defaults.
+Possible next iterations are broader accessibility regression coverage and an explicit migration plan if the SwiftData schema grows beyond additive changes with safe defaults.
