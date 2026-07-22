@@ -100,6 +100,18 @@ final class DevJourneyUITests: XCTestCase {
         overviewScreenshot.lifetime = .keepAlways
         add(overviewScreenshot)
 
+        let projectFilter = app.segmentedControls["projects.filter"]
+        XCTAssertTrue(projectFilter.waitForExistence(timeout: 2))
+        projectFilter.buttons["Bereit"].tap()
+        XCTAssertTrue(projectRow.waitForNonExistence(timeout: 2))
+        XCTAssertTrue(
+            app.staticTexts["Keine passenden Projekte"]
+                .waitForExistence(timeout: 2)
+        )
+
+        projectFilter.buttons["Aufmerksamkeit"].tap()
+        XCTAssertTrue(projectRow.waitForExistence(timeout: 2))
+
         projectRow.tap()
         XCTAssertTrue(app.navigationBars["Projekt"].waitForExistence(timeout: 2))
 

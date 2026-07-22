@@ -9,6 +9,25 @@ import Foundation
 import Observation
 import SwiftData
 
+enum ProjectListFilter: String, CaseIterable, Identifiable {
+    case all
+    case needsAttention
+    case portfolioReady
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .all:
+            "Alle"
+        case .needsAttention:
+            "Aufmerksamkeit"
+        case .portfolioReady:
+            "Bereit"
+        }
+    }
+}
+
 @Observable
 final class ProjectsViewModel {
     var newProjectTitle = ""
@@ -17,8 +36,10 @@ final class ProjectsViewModel {
     var newProjectNotes = ""
     var newProjectStatus = PortfolioProjectStatus.planned
     var isShowingAddProject = false
+    var selectedFilter = ProjectListFilter.all
 
     let availableStatuses = PortfolioProjectStatus.all
+    let availableFilters = ProjectListFilter.allCases
 
     var canAddProject: Bool {
         !trimmedTitle.isEmpty && hasValidGitHubURL
@@ -50,6 +71,31 @@ final class ProjectsViewModel {
 
     func hasOpenStep(for project: PortfolioProject) -> Bool {
         project.nextOpenStepTitle != nil
+    }
+
+    func visibleProjects(
+        from projects: [PortfolioProject],
+        matching searchText: String
+    ) -> [PortfolioProject] {
+        let normalizedSearchText = searchText.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+
+        return projects
+            .filter { project in
+                matchesSelectedFilter(project) &&
+                    matchesSearch(project, searchText: normalizedSearchText)
+            }
+            .sorted { firstProject, secondProject in
+                let firstPriority = priority(for: firstProject.status)
+                let secondPriority = priority(for: secondProject.status)
+
+                if firstPriority == secondPriority {
+                    return firstProject.createdAt > secondProject.createdAt
+                }
+
+                return firstPriority < secondPriority
+            }
     }
 
     func startAddingProject() {
@@ -91,6 +137,39 @@ final class ProjectsViewModel {
         newProjectNotes = ""
         newProjectStatus = PortfolioProjectStatus.planned
         isShowingAddProject = false
+    }
+
+    private func matchesSelectedFilter(_ project: PortfolioProject) -> Bool {
+        switch selectedFilter {
+        case .all:
+            true
+        case .needsAttention:
+            project.openActionCount > 0
+        case .portfolioReady:
+            project.isPortfolioReady
+        }
+    }
+
+    private func matchesSearch(
+        _ project: PortfolioProject,
+        searchText: String
+    ) -> Bool {
+        guard !searchText.isEmpty else { return true }
+
+        return project.title.localizedStandardContains(searchText) ||
+            project.summary.localizedStandardContains(searchText) ||
+            project.githubURL.localizedStandardContains(searchText)
+    }
+
+    private func priority(for status: String) -> Int {
+        switch status {
+        case PortfolioProjectStatus.inProgress:
+            0
+        case PortfolioProjectStatus.completed:
+            2
+        default:
+            1
+        }
     }
 
     private var trimmedTitle: String {

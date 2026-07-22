@@ -17,6 +17,7 @@ Version 0.2 adds project milestones and a compact portfolio-readiness workflow w
 - Add, edit, reorder, complete, and delete project milestones
 - Review a fixed six-point portfolio-readiness checklist with progress
 - See the next open milestone or readiness requirement for every project
+- Filter projects by open attention and portfolio readiness alongside search
 - Identify portfolio-ready projects and the project with the most open work on the dashboard
 - Track job applications by company, position, status, and optional application date
 - Review key metrics and application status distribution with Swift Charts

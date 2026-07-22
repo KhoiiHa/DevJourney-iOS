@@ -16,19 +16,6 @@ struct ProjectsView: View {
     @State private var searchText = ""
     @FocusState private var isTitleFieldFocused: Bool
 
-    private var sortedProjects: [PortfolioProject] {
-        projects.sorted { firstProject, secondProject in
-            let firstPriority = priority(for: firstProject.status)
-            let secondPriority = priority(for: secondProject.status)
-
-            if firstPriority == secondPriority {
-                return firstProject.createdAt > secondProject.createdAt
-            }
-
-            return firstPriority < secondPriority
-        }
-    }
-
     var body: some View {
         List {
             if projects.isEmpty {
@@ -42,14 +29,17 @@ struct ProjectsView: View {
                     }
                     .buttonStyle(.borderedProminent)
                 }
-            } else if isSearching && filteredProjects.isEmpty {
+            } else if visibleProjects.isEmpty {
                 ContentUnavailableView {
-                    Label("Keine passenden Projekte", systemImage: "magnifyingglass")
+                    Label(
+                        "Keine passenden Projekte",
+                        systemImage: "line.3.horizontal.decrease.circle"
+                    )
                 } description: {
-                    Text("Passe deinen Suchbegriff an oder lege ein neues Projekt an.")
+                    Text("Passe den Filter oder deinen Suchbegriff an.")
                 }
             } else {
-                ForEach(filteredProjects) { project in
+                ForEach(visibleProjects) { project in
                     NavigationLink {
                         ProjectDetailView(project: project)
                     } label: {
@@ -121,6 +111,21 @@ struct ProjectsView: View {
             }
         }
         .listStyle(.insetGrouped)
+        .safeAreaInset(edge: .top, spacing: 0) {
+            if !projects.isEmpty {
+                Picker("Projektfilter", selection: $viewModel.selectedFilter) {
+                    ForEach(viewModel.availableFilters) { filter in
+                        Text(filter.title)
+                            .tag(filter)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("projects.filter")
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(.bar)
+            }
+        }
         .navigationTitle("Projekte")
         .navigationBarTitleDisplayMode(.inline)
         .searchable(text: $searchText, prompt: "Projekte suchen")
@@ -212,24 +217,8 @@ struct ProjectsView: View {
         }
     }
 
-    private var filteredProjects: [PortfolioProject] {
-        guard !normalizedSearchText.isEmpty else {
-            return sortedProjects
-        }
-
-        return sortedProjects.filter { project in
-            project.title.localizedStandardContains(normalizedSearchText) ||
-            project.summary.localizedStandardContains(normalizedSearchText) ||
-            project.githubURL.localizedStandardContains(normalizedSearchText)
-        }
-    }
-
-    private var isSearching: Bool {
-        !normalizedSearchText.isEmpty
-    }
-
-    private var normalizedSearchText: String {
-        searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+    private var visibleProjects: [PortfolioProject] {
+        viewModel.visibleProjects(from: projects, matching: searchText)
     }
 
     private func color(for status: String) -> Color {
@@ -240,17 +229,6 @@ struct ProjectsView: View {
             return .green
         default:
             return .secondary
-        }
-    }
-
-    private func priority(for status: String) -> Int {
-        switch status {
-        case PortfolioProjectStatus.inProgress:
-            return 0
-        case PortfolioProjectStatus.completed:
-            return 2
-        default:
-            return 1
         }
     }
 

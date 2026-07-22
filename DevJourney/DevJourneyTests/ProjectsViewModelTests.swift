@@ -61,6 +61,80 @@ struct ProjectsViewModelTests {
         #expect(viewModel.validationMessage == nil)
     }
 
+    @Test func projectFiltersSeparateAttentionAndPortfolioReadiness() {
+        let viewModel = ProjectsViewModel()
+        let needsAttention = PortfolioProject(title: "DevJourney")
+        let ready = makePortfolioReadyProject()
+        ready.title = "TripFlow"
+        let readyWithOpenMilestone = makePortfolioReadyProject()
+        readyWithOpenMilestone.title = "ReadRhythm"
+        readyWithOpenMilestone.milestones = [
+            ProjectMilestone(title: "Polish abschließen"),
+        ]
+        let projects = [needsAttention, ready, readyWithOpenMilestone]
+
+        viewModel.selectedFilter = .needsAttention
+        #expect(
+            Set(viewModel.visibleProjects(from: projects, matching: "").map(\.title)) ==
+                ["DevJourney", "ReadRhythm"]
+        )
+
+        viewModel.selectedFilter = .portfolioReady
+        #expect(
+            Set(viewModel.visibleProjects(from: projects, matching: "").map(\.title)) ==
+                ["ReadRhythm", "TripFlow"]
+        )
+    }
+
+    @Test func projectFilterCombinesWithSearch() {
+        let viewModel = ProjectsViewModel()
+        let devJourney = PortfolioProject(
+            title: "DevJourney",
+            summary: "Karriere-Cockpit"
+        )
+        let readRhythm = PortfolioProject(
+            title: "ReadRhythm",
+            githubURL: "https://github.com/example/readrhythm"
+        )
+
+        let visibleProjects = viewModel.visibleProjects(
+            from: [devJourney, readRhythm],
+            matching: "  rhythm  "
+        )
+
+        #expect(visibleProjects.map(\.title) == ["ReadRhythm"])
+    }
+
+    @Test func projectFilterPreservesStatusAndDateOrdering() {
+        let viewModel = ProjectsViewModel()
+        let planned = PortfolioProject(
+            title: "Geplant",
+            status: PortfolioProjectStatus.planned,
+            createdAt: Date(timeIntervalSince1970: 300)
+        )
+        let inProgress = PortfolioProject(
+            title: "In Arbeit",
+            status: PortfolioProjectStatus.inProgress,
+            createdAt: Date(timeIntervalSince1970: 100)
+        )
+        let completed = PortfolioProject(
+            title: "Abgeschlossen",
+            status: PortfolioProjectStatus.completed,
+            createdAt: Date(timeIntervalSince1970: 400)
+        )
+
+        let visibleProjects = viewModel.visibleProjects(
+            from: [planned, inProgress, completed],
+            matching: ""
+        )
+
+        #expect(visibleProjects.map(\.title) == [
+            "In Arbeit",
+            "Geplant",
+            "Abgeschlossen",
+        ])
+    }
+
     @Test func projectRowSummarizesReadinessAndNextOpenStep() {
         let viewModel = ProjectsViewModel()
         let project = PortfolioProject(
