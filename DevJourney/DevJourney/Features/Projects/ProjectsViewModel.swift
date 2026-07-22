@@ -32,6 +32,26 @@ final class ProjectsViewModel {
         return hasValidGitHubURL ? nil : "Bitte gib einen gültigen GitHub-Link ein."
     }
 
+    func readinessProgress(for project: PortfolioProject) -> Double {
+        project.readinessProgress
+    }
+
+    func readinessProgressText(for project: PortfolioProject) -> String {
+        "\(project.readinessCompletedCount) von \(project.readinessTotalCount)"
+    }
+
+    func nextStepText(for project: PortfolioProject) -> String {
+        guard let nextStep = project.nextOpenStepTitle else {
+            return "Portfolio-bereit"
+        }
+
+        return "Als Nächstes: \(nextStep)"
+    }
+
+    func hasOpenStep(for project: PortfolioProject) -> Bool {
+        project.nextOpenStepTitle != nil
+    }
+
     func startAddingProject() {
         isShowingAddProject = true
     }

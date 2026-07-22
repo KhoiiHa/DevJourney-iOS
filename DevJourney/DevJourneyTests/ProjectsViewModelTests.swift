@@ -61,6 +61,52 @@ struct ProjectsViewModelTests {
         #expect(viewModel.validationMessage == nil)
     }
 
+    @Test func projectRowSummarizesReadinessAndNextOpenStep() {
+        let viewModel = ProjectsViewModel()
+        let project = PortfolioProject(
+            title: "DevJourney",
+            isAppStable: true,
+            hasTests: true,
+            hasReadme: true
+        )
+        project.milestones = [
+            ProjectMilestone(title: "Screenshots erstellen"),
+        ]
+
+        #expect(viewModel.readinessProgress(for: project) == 0.5)
+        #expect(viewModel.readinessProgressText(for: project) == "3 von 6")
+        #expect(
+            viewModel.nextStepText(for: project) ==
+                "Als Nächstes: Screenshots erstellen"
+        )
+        #expect(viewModel.hasOpenStep(for: project) == true)
+    }
+
+    @Test func projectRowRecognizesPortfolioReadyProject() {
+        let viewModel = ProjectsViewModel()
+        let project = makePortfolioReadyProject()
+
+        #expect(viewModel.readinessProgress(for: project) == 1)
+        #expect(viewModel.readinessProgressText(for: project) == "6 von 6")
+        #expect(viewModel.nextStepText(for: project) == "Portfolio-bereit")
+        #expect(viewModel.hasOpenStep(for: project) == false)
+    }
+
+    @Test func projectRowKeepsOpenMilestoneVisibleAfterReadinessIsComplete() {
+        let viewModel = ProjectsViewModel()
+        let project = makePortfolioReadyProject()
+        project.milestones = [
+            ProjectMilestone(title: "Case Study überarbeiten"),
+        ]
+
+        #expect(project.isPortfolioReady == true)
+        #expect(viewModel.hasOpenStep(for: project) == true)
+        #expect(
+            viewModel.nextStepText(for: project) ==
+                "Als Nächstes: Case Study überarbeiten"
+        )
+    }
+
     @Test func projectDetailRequiresTitleAndSavesTrimmedValues() {
         let project = PortfolioProject(title: "DevJourney")
         let viewModel = ProjectDetailViewModel(project: project)

@@ -79,6 +79,27 @@ final class DevJourneyUITests: XCTestCase {
 
         let projectRow = app.buttons["project.row.Portfolio UI-Test"]
         XCTAssertTrue(projectRow.waitForExistence(timeout: 2))
+
+        let rowReadiness = app.staticTexts[
+            "project.row.readiness.Portfolio UI-Test"
+        ]
+        XCTAssertTrue(rowReadiness.waitForExistence(timeout: 2))
+        XCTAssertEqual(rowReadiness.label, "0 von 6")
+
+        let rowNextStep = app.staticTexts[
+            "project.row.next-step.Portfolio UI-Test"
+        ]
+        XCTAssertTrue(rowNextStep.waitForExistence(timeout: 2))
+        XCTAssertEqual(
+            rowNextStep.label,
+            "Als Nächstes: App funktioniert stabil"
+        )
+
+        let overviewScreenshot = XCTAttachment(screenshot: app.screenshot())
+        overviewScreenshot.name = "Projektübersicht mit Readiness"
+        overviewScreenshot.lifetime = .keepAlways
+        add(overviewScreenshot)
+
         projectRow.tap()
         XCTAssertTrue(app.navigationBars["Projekt"].waitForExistence(timeout: 2))
 

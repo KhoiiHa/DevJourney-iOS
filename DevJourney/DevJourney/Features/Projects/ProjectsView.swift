@@ -75,6 +75,37 @@ struct ProjectsView: View {
                                         .foregroundStyle(.secondary)
                                 }
                             }
+
+                            HStack(spacing: 8) {
+                                ProgressView(
+                                    value: viewModel.readinessProgress(for: project)
+                                )
+
+                                Text(viewModel.readinessProgressText(for: project))
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize(horizontal: true, vertical: false)
+                                    .accessibilityIdentifier(
+                                        "project.row.readiness.\(project.title)"
+                                    )
+                            }
+                            .font(.caption)
+
+                            Label(
+                                viewModel.nextStepText(for: project),
+                                systemImage: viewModel.hasOpenStep(for: project)
+                                    ? "arrow.forward.circle"
+                                    : "checkmark.seal.fill"
+                            )
+                            .font(.caption)
+                            .foregroundStyle(
+                                viewModel.hasOpenStep(for: project)
+                                    ? Color.secondary
+                                    : Color.green
+                            )
+                            .lineLimit(2)
+                            .accessibilityIdentifier(
+                                "project.row.next-step.\(project.title)"
+                            )
                         }
                     }
                     .accessibilityIdentifier("project.row.\(project.title)")
