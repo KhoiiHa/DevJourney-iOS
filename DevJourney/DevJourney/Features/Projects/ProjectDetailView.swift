@@ -77,10 +77,16 @@ struct ProjectDetailView: View {
                             .accessibilityLabel(
                                 milestone.isCompleted ? "Als offen markieren" : "Als erledigt markieren"
                             )
+                            .accessibilityIdentifier(
+                                "project.milestone.toggle.\(milestone.title)"
+                            )
 
                             Text(milestone.title)
                                 .strikethrough(milestone.isCompleted)
                                 .foregroundStyle(milestone.isCompleted ? .secondary : .primary)
+                                .accessibilityIdentifier(
+                                    "project.milestone.title.\(milestone.title)"
+                                )
 
                             Spacer()
 
@@ -108,6 +114,7 @@ struct ProjectDetailView: View {
                 } label: {
                     Label("Meilenstein hinzufügen", systemImage: "plus")
                 }
+                .accessibilityIdentifier("project.milestone.add")
 
                 if project.milestones.count > 1 {
                     Button {
@@ -122,6 +129,7 @@ struct ProjectDetailView: View {
                                 : "arrow.up.arrow.down"
                         )
                     }
+                    .accessibilityIdentifier("project.milestone.reorder")
                 }
             } header: {
                 Text("Meilensteine")
@@ -133,6 +141,7 @@ struct ProjectDetailView: View {
                     Spacer()
                     Text(viewModel.readinessProgressText(for: project))
                         .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("project.readiness.progress")
                 }
 
                 ProgressView(value: viewModel.readinessProgress(for: project))
@@ -155,12 +164,14 @@ struct ProjectDetailView: View {
                             }
                         )
                     )
+                    .accessibilityIdentifier("project.readiness.\(requirement.rawValue)")
                 }
             } header: {
                 Text("Portfolio-Readiness")
             } footer: {
                 if let nextStep = viewModel.nextOpenStepTitle(for: project) {
                     Label("Als Nächstes: \(nextStep)", systemImage: "arrow.forward.circle")
+                        .accessibilityIdentifier("project.next-step")
                 } else {
                     Label("Portfolio-bereit", systemImage: "checkmark.seal.fill")
                         .foregroundStyle(.green)

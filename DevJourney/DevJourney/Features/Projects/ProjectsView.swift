@@ -77,6 +77,7 @@ struct ProjectsView: View {
                             }
                         }
                     }
+                    .accessibilityIdentifier("project.row.\(project.title)")
                     .padding(.vertical, 4)
                     .swipeActions(edge: .trailing) {
                         Button(role: .destructive) {
@@ -99,6 +100,7 @@ struct ProjectsView: View {
                 } label: {
                     Label("Projekt hinzufügen", systemImage: "plus")
                 }
+                .accessibilityIdentifier("projects.add")
             }
         }
         .sheet(isPresented: $viewModel.isShowingAddProject, onDismiss: {
@@ -108,6 +110,7 @@ struct ProjectsView: View {
                 Form {
                     Section {
                         TextField("Titel", text: $viewModel.newProjectTitle)
+                            .accessibilityIdentifier("project.create.title")
                             .focused($isTitleFieldFocused)
                             .submitLabel(.next)
 
@@ -159,6 +162,7 @@ struct ProjectsView: View {
                         Button("Speichern") {
                             addProject()
                         }
+                        .accessibilityIdentifier("project.create.save")
                         .disabled(!viewModel.canAddProject)
                     }
                 }

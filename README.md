@@ -75,7 +75,7 @@ The unit suite covers validation and persistence behavior across goals, projects
 - milestone creation, editing, and persistence
 - dashboard readiness counts and attention prioritization
 
-UI tests cover creating a learning goal, dashboard navigation, and launch behavior.
+UI tests cover creating a learning goal, dashboard navigation, launch behavior, and the complete project milestone and readiness workflow.
 
 Run the unit suite with:
 
