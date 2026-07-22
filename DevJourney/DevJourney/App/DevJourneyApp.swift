@@ -47,7 +47,11 @@ struct DevJourneyApp: App {
                 isStoredInMemoryOnly: true
             )
 
-            return try ModelContainer(for: schema, configurations: [configuration])
+            return try ModelContainer(
+                for: schema,
+                migrationPlan: DevJourneyMigrationPlan.self,
+                configurations: [configuration]
+            )
         }
         #endif
 
@@ -58,16 +62,15 @@ struct DevJourneyApp: App {
             url: storeURL
         )
 
-        return try ModelContainer(for: schema, configurations: [configuration])
+        return try ModelContainer(
+            for: schema,
+            migrationPlan: DevJourneyMigrationPlan.self,
+            configurations: [configuration]
+        )
     }
 
     private static var appSchema: Schema {
-        Schema([
-            LearningGoal.self,
-            PortfolioProject.self,
-            ProjectMilestone.self,
-            JobApplication.self,
-        ])
+        Schema(versionedSchema: DevJourneySchemaV1.self)
     }
 
     private static var storeURL: URL {

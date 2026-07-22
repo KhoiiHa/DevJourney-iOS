@@ -66,6 +66,20 @@ DevJourney/
 
 No service or repository layer is used because all data remains local and the current feature scope does not require one.
 
+## SwiftData Migrations
+
+DevJourney 0.2 defines the persisted baseline as `DevJourneySchemaV1` with schema version `1.0.0`. Every app container, including the in-memory UI-test container, uses `DevJourneyMigrationPlan`.
+
+For future persisted model changes:
+
+1. Preserve the V1 model shape before changing properties or relationships.
+2. Add a new `VersionedSchema` instead of replacing the V1 baseline.
+3. Append the new schema and an explicit lightweight or custom migration stage to `DevJourneyMigrationPlan`.
+4. Extend the migration tests with representative data from the previous schema.
+5. Never delete the persistent store as an automatic recovery path for migration failures.
+
+The `--reset-store` launch argument remains an explicit DEBUG-only development tool and is not part of production migration behavior.
+
 ## Tests
 
 The unit suite covers validation and persistence behavior across goals, projects, applications, and the dashboard. Version 0.2 specifically verifies:
@@ -75,6 +89,7 @@ The unit suite covers validation and persistence behavior across goals, projects
 - completed projects and projects without milestones
 - milestone creation, editing, and persistence
 - dashboard readiness counts and attention prioritization
+- opening existing unversioned stores with the versioned schema and migration plan
 
 UI tests cover creating a learning goal, dashboard navigation, launch behavior, and the complete project milestone and readiness workflow.
 
@@ -93,4 +108,4 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild \
 
 DevJourney 0.2 is intentionally local and single-user. Cloud sync, authentication, AI prioritization, reminders, and exports remain out of scope.
 
-Possible next iterations are broader accessibility regression coverage and an explicit migration plan if the SwiftData schema grows beyond additive changes with safe defaults.
+Possible next iterations are broader accessibility regression coverage and release automation.
