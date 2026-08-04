@@ -70,7 +70,7 @@ struct DevJourneyApp: App {
     }
 
     private static var appSchema: Schema {
-        Schema(versionedSchema: DevJourneySchemaV1.self)
+        Schema(versionedSchema: DevJourneySchemaV2.self)
     }
 
     private static var storeURL: URL {

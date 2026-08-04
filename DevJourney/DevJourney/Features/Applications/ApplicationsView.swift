@@ -37,7 +37,8 @@ struct ApplicationsView: View {
         return sortedApplications.filter { application in
             application.companyName.localizedStandardContains(normalizedSearchText) ||
             application.positionTitle.localizedStandardContains(normalizedSearchText) ||
-            application.jobURL.localizedStandardContains(normalizedSearchText)
+            application.jobURL.localizedStandardContains(normalizedSearchText) ||
+            application.nextAction.localizedStandardContains(normalizedSearchText)
         }
     }
 
@@ -110,6 +111,7 @@ struct ApplicationsView: View {
                 } label: {
                     Label("Bewerbung hinzufügen", systemImage: "plus")
                 }
+                .accessibilityIdentifier("applications.add")
             }
         }
         .sheet(isPresented: $viewModel.isShowingAddApplication, onDismiss: {
@@ -121,9 +123,11 @@ struct ApplicationsView: View {
                         TextField("Firma", text: $viewModel.companyName)
                             .focused($isCompanyFieldFocused)
                             .submitLabel(.next)
+                            .accessibilityIdentifier("application.create.company")
 
                         TextField("Position", text: $viewModel.positionTitle)
                             .submitLabel(.next)
+                            .accessibilityIdentifier("application.create.position")
 
                         TextField("Stellenanzeige-Link", text: $viewModel.jobURL)
                             .textInputAutocapitalization(.never)
@@ -163,6 +167,25 @@ struct ApplicationsView: View {
                             )
                         }
                     }
+
+                    Section {
+                        TextField("Zum Beispiel: Nach Status fragen", text: $viewModel.nextAction)
+                            .accessibilityIdentifier("application.create.next-action")
+
+                        Toggle("Follow-up-Datum setzen", isOn: $viewModel.hasFollowUpDate)
+
+                        if viewModel.hasFollowUpDate {
+                            DatePicker(
+                                "Follow-up",
+                                selection: $viewModel.followUpAt,
+                                displayedComponents: .date
+                            )
+                        }
+                    } header: {
+                        Text("Nächste Aktion")
+                    } footer: {
+                        Text("Ohne Datum bleibt die Aktion offen, wird aber nicht als fällig gezählt.")
+                    }
                 }
                 .navigationTitle("Bewerbung")
                 .navigationBarTitleDisplayMode(.inline)
@@ -178,6 +201,7 @@ struct ApplicationsView: View {
                             addApplication()
                         }
                         .disabled(!viewModel.canAddApplication)
+                        .accessibilityIdentifier("application.create.save")
                     }
                 }
                 .onAppear {
@@ -260,9 +284,28 @@ struct ApplicationsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 }
+
+                if application.hasOpenFollowUp {
+                    Label(
+                        application.normalizedNextAction,
+                        systemImage: "arrow.forward.circle"
+                    )
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier(
+                        "application.row.next-action.\(application.companyName)"
+                    )
+
+                    if let followUpAt = application.followUpAt {
+                        Label("Follow-up am \(followUpAt, style: .date)", systemImage: "calendar.badge.clock")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
             .padding(.vertical, 4)
         }
+        .accessibilityIdentifier("application.row.\(application.companyName)")
     }
 
     private func deleteApplication(_ application: JobApplication) {

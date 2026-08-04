@@ -153,6 +153,54 @@ final class DevJourneyUITests: XCTestCase {
     }
 
     @MainActor
+    func testApplicationNextActionAppearsOnDashboard() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing")
+        app.launch()
+
+        app.staticTexts["Bewerbungen öffnen"].tap()
+        XCTAssertTrue(app.navigationBars["Bewerbungen"].waitForExistence(timeout: 2))
+
+        app.buttons["applications.add"].tap()
+
+        let companyField = app.textFields["application.create.company"]
+        XCTAssertTrue(companyField.waitForExistence(timeout: 2))
+        companyField.tap()
+        companyField.typeText("Example GmbH")
+
+        let positionField = app.textFields["application.create.position"]
+        positionField.tap()
+        positionField.typeText("Junior iOS Developer")
+
+        let actionField = app.textFields["application.create.next-action"]
+        reveal(actionField, in: app)
+        actionField.tap()
+        actionField.typeText("Nach Bewerbungsstatus fragen")
+
+        app.buttons["application.create.save"].tap()
+
+        let rowAction = app.staticTexts[
+            "application.row.next-action.Example GmbH"
+        ]
+        XCTAssertTrue(rowAction.waitForExistence(timeout: 2))
+        XCTAssertEqual(rowAction.label, "Nach Bewerbungsstatus fragen")
+
+        app.navigationBars["Bewerbungen"].buttons.element(boundBy: 0).tap()
+
+        let dashboardFollowUp = app.buttons["dashboard.application-follow-up"]
+        XCTAssertTrue(dashboardFollowUp.waitForExistence(timeout: 2))
+        XCTAssertTrue(
+            dashboardFollowUp.label.contains("Nach Bewerbungsstatus fragen")
+        )
+        XCTAssertFalse(app.staticTexts["Fortschritt prüfen"].exists)
+
+        let dashboardScreenshot = XCTAttachment(screenshot: app.screenshot())
+        dashboardScreenshot.name = "Dashboard mit Bewerbungs-Fokus"
+        dashboardScreenshot.lifetime = .keepAlways
+        add(dashboardScreenshot)
+    }
+
+    @MainActor
     func testLaunchPerformance() throws {
         // This measures how long it takes to launch your application.
         measure(metrics: [XCTApplicationLaunchMetric()]) {

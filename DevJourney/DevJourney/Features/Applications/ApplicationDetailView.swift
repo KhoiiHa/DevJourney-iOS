@@ -85,6 +85,27 @@ struct ApplicationDetailView: View {
                     )
                 }
             }
+
+            Section {
+                TextField("Zum Beispiel: Nach Status fragen", text: $viewModel.nextAction)
+                    .accessibilityIdentifier("application.detail.next-action")
+
+                Toggle("Follow-up-Datum setzen", isOn: $viewModel.hasFollowUpDate)
+                    .accessibilityIdentifier("application.detail.follow-up-toggle")
+
+                if viewModel.hasFollowUpDate {
+                    DatePicker(
+                        "Follow-up",
+                        selection: $viewModel.followUpAt,
+                        displayedComponents: .date
+                    )
+                    .accessibilityIdentifier("application.detail.follow-up-date")
+                }
+            } header: {
+                Text("Nächste Aktion")
+            } footer: {
+                Text("Ohne Datum bleibt die Aktion offen, wird aber nicht als fällig gezählt.")
+            }
         }
         .navigationTitle("Bewerbung")
         .navigationBarTitleDisplayMode(.inline)
@@ -100,6 +121,7 @@ struct ApplicationDetailView: View {
                     saveApplication()
                 }
                 .disabled(!viewModel.canSave)
+                .accessibilityIdentifier("application.detail.save")
             }
         }
         .confirmationDialog(

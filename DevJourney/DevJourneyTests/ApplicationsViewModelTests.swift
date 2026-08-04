@@ -51,6 +51,36 @@ struct ApplicationsViewModelTests {
         #expect(applications.first?.jobURL == "https://jobs.apple.com/example")
     }
 
+    @MainActor
+    @Test func applicationFollowUpIsValidatedTrimmedAndPersisted() throws {
+        let container = try ModelContainer(
+            for: JobApplication.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let viewModel = ApplicationsViewModel()
+        viewModel.companyName = "Example GmbH"
+        viewModel.positionTitle = "Junior iOS Developer"
+        viewModel.hasFollowUpDate = true
+
+        #expect(viewModel.canAddApplication == false)
+        #expect(
+            viewModel.validationMessage ==
+                "Ergänze eine nächste Aktion für das Follow-up-Datum."
+        )
+
+        let followUpDate = Date(timeIntervalSince1970: 1_000)
+        viewModel.nextAction = "  Nach Bewerbungsstatus fragen  "
+        viewModel.followUpAt = followUpDate
+
+        try viewModel.addApplication(using: container.mainContext)
+
+        let application = try container.mainContext
+            .fetch(FetchDescriptor<JobApplication>())
+            .first
+        #expect(application?.nextAction == "Nach Bewerbungsstatus fragen")
+        #expect(application?.followUpAt == followUpDate)
+    }
+
     @Test func applicationRequiresValidJobURLWhenProvided() {
         let viewModel = ApplicationsViewModel()
         viewModel.companyName = "Apple"
@@ -88,6 +118,9 @@ struct ApplicationsViewModelTests {
         viewModel.jobURL = " https://jobs.example.com/ios "
         viewModel.status = JobApplicationStatus.interview
         viewModel.hasAppliedDate = false
+        viewModel.nextAction = "  Interview vorbereiten  "
+        viewModel.hasFollowUpDate = true
+        viewModel.followUpAt = date.addingTimeInterval(86_400)
         viewModel.save(to: application)
 
         #expect(application.companyName == "OpenAI")
@@ -95,6 +128,8 @@ struct ApplicationsViewModelTests {
         #expect(application.jobURL == "https://jobs.example.com/ios")
         #expect(application.status == JobApplicationStatus.interview)
         #expect(application.appliedAt == nil)
+        #expect(application.nextAction == "Interview vorbereiten")
+        #expect(application.followUpAt == date.addingTimeInterval(86_400))
         #expect(viewModel.validationMessage == nil)
     }
 
@@ -114,6 +149,26 @@ struct ApplicationsViewModelTests {
 
         #expect(viewModel.canSave == true)
         #expect(viewModel.validJobURL?.absoluteString == "https://jobs.apple.com/example")
+    }
+
+    @Test func applicationRecognizesDueFollowUpsSafely() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let referenceDate = Date(timeIntervalSince1970: 172_800)
+        let application = JobApplication(
+            companyName: "Example GmbH",
+            positionTitle: "iOS Developer",
+            nextAction: "Nachfassen",
+            followUpAt: referenceDate
+        )
+
+        #expect(application.hasOpenFollowUp)
+        #expect(application.isFollowUpDue(on: referenceDate, calendar: calendar))
+
+        application.nextAction = "  "
+
+        #expect(application.hasOpenFollowUp == false)
+        #expect(application.isFollowUpDue(on: referenceDate, calendar: calendar) == false)
     }
 
 }

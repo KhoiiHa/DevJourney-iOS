@@ -84,6 +84,94 @@ struct DashboardViewModelTests {
         #expect(completedSummary.nextStepTitle == nil)
     }
 
+    @Test func applicationFollowUpSummarySelectsEarliestDatedAction() {
+        let undatedApplication = JobApplication(
+            companyName: "Undatiert GmbH",
+            positionTitle: "iOS Developer",
+            nextAction: "Portfolio senden",
+            createdAt: Date(timeIntervalSince1970: 50)
+        )
+        let laterApplication = JobApplication(
+            companyName: "Later GmbH",
+            positionTitle: "Swift Developer",
+            nextAction: "Nachfassen",
+            followUpAt: Date(timeIntervalSince1970: 300),
+            createdAt: Date(timeIntervalSince1970: 100)
+        )
+        let nextApplication = JobApplication(
+            companyName: "Next GmbH",
+            positionTitle: "Junior Developer",
+            nextAction: "Interview bestätigen",
+            followUpAt: Date(timeIntervalSince1970: 200),
+            createdAt: Date(timeIntervalSince1970: 150)
+        )
+
+        let summary = viewModel.applicationFollowUpSummary(
+            for: [undatedApplication, laterApplication, nextApplication],
+            on: Date(timeIntervalSince1970: 100)
+        )
+
+        #expect(summary.nextApplication === nextApplication)
+        #expect(summary.nextActionTitle == "Interview bestätigen")
+    }
+
+    @Test func applicationFollowUpSummaryCountsDueActionsAndIgnoresEmptyOnes() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let referenceDate = Date(timeIntervalSince1970: 172_800)
+        let overdueApplication = JobApplication(
+            companyName: "Overdue GmbH",
+            positionTitle: "iOS Developer",
+            nextAction: "Nachfassen",
+            followUpAt: referenceDate.addingTimeInterval(-86_400)
+        )
+        let dueTodayApplication = JobApplication(
+            companyName: "Today GmbH",
+            positionTitle: "Swift Developer",
+            nextAction: "Unterlagen senden",
+            followUpAt: referenceDate.addingTimeInterval(3_600)
+        )
+        let futureApplication = JobApplication(
+            companyName: "Future GmbH",
+            positionTitle: "Junior Developer",
+            nextAction: "Interview bestätigen",
+            followUpAt: referenceDate.addingTimeInterval(172_800)
+        )
+        let emptyApplication = JobApplication(
+            companyName: "Empty GmbH",
+            positionTitle: "Developer",
+            nextAction: "  ",
+            followUpAt: referenceDate
+        )
+
+        let summary = viewModel.applicationFollowUpSummary(
+            for: [
+                overdueApplication,
+                dueTodayApplication,
+                futureApplication,
+                emptyApplication,
+            ],
+            on: referenceDate,
+            calendar: calendar
+        )
+
+        #expect(summary.dueCount == 2)
+        #expect(summary.nextApplication === overdueApplication)
+    }
+
+    @Test func applicationFollowUpSummaryHandlesApplicationsWithoutActions() {
+        let application = JobApplication(
+            companyName: "Example GmbH",
+            positionTitle: "iOS Developer"
+        )
+
+        let summary = viewModel.applicationFollowUpSummary(for: [application])
+
+        #expect(summary.dueCount == 0)
+        #expect(summary.nextApplication == nil)
+        #expect(summary.nextActionTitle == nil)
+    }
+
     private func makePortfolioReadyProject(title: String) -> PortfolioProject {
         PortfolioProject(
             title: title,

@@ -25,6 +25,8 @@ final class JobApplication {
     var jobURL: String
     var status: String
     var appliedAt: Date?
+    var nextAction: String = ""
+    var followUpAt: Date?
     var createdAt: Date
 
     init(
@@ -33,6 +35,8 @@ final class JobApplication {
         jobURL: String = "",
         status: String = JobApplicationStatus.open,
         appliedAt: Date? = nil,
+        nextAction: String = "",
+        followUpAt: Date? = nil,
         createdAt: Date = Date()
     ) {
         self.companyName = companyName
@@ -40,6 +44,33 @@ final class JobApplication {
         self.jobURL = jobURL
         self.status = status
         self.appliedAt = appliedAt
+        self.nextAction = nextAction
+        self.followUpAt = followUpAt
         self.createdAt = createdAt
+    }
+}
+
+extension JobApplication {
+    var normalizedNextAction: String {
+        nextAction.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    var hasOpenFollowUp: Bool {
+        !normalizedNextAction.isEmpty
+    }
+
+    func isFollowUpDue(
+        on referenceDate: Date,
+        calendar: Calendar = .current
+    ) -> Bool {
+        guard hasOpenFollowUp, let followUpAt else { return false }
+
+        let startOfTomorrow = calendar.date(
+            byAdding: .day,
+            value: 1,
+            to: calendar.startOfDay(for: referenceDate)
+        ) ?? referenceDate
+
+        return followUpAt < startOfTomorrow
     }
 }

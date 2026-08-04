@@ -52,6 +52,10 @@ struct DashboardView: View {
         viewModel.portfolioSummary(for: projects)
     }
 
+    private var applicationFollowUpSummary: DashboardApplicationFollowUpSummary {
+        viewModel.applicationFollowUpSummary(for: applications)
+    }
+
     private var focusItems: [DashboardFocusItem] {
         var items: [DashboardFocusItem] = []
 
@@ -88,7 +92,10 @@ struct DashboardView: View {
             )
         }
 
-        if items.isEmpty && hasAnyContent && portfolioSummary.attentionProject == nil {
+        if items.isEmpty &&
+            hasAnyContent &&
+            portfolioSummary.attentionProject == nil &&
+            applicationFollowUpSummary.nextApplication == nil {
             items.append(
                 DashboardFocusItem(
                     title: "Fortschritt prüfen",
@@ -176,6 +183,12 @@ struct DashboardView: View {
                         DashboardPortfolioSection(summary: portfolioSummary)
                     }
 
+                    if applicationFollowUpSummary.nextApplication != nil {
+                        DashboardApplicationFollowUpSection(
+                            summary: applicationFollowUpSummary
+                        )
+                    }
+
                     if !hasAnyContent {
                         DashboardFirstRunView()
                     }
@@ -246,6 +259,71 @@ struct DashboardView: View {
             }
             .navigationTitle("Dashboard")
             .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+private struct DashboardApplicationFollowUpSection: View {
+    let summary: DashboardApplicationFollowUpSummary
+
+    var body: some View {
+        if let application = summary.nextApplication,
+           let nextActionTitle = summary.nextActionTitle {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Bewerbungs-Fokus")
+                    .font(.headline)
+
+                NavigationLink {
+                    ApplicationDetailView(application: application)
+                } label: {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: "calendar.badge.clock")
+                            .font(.title3)
+                            .foregroundStyle(summary.dueCount > 0 ? .orange : .secondary)
+                            .frame(width: 28)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(application.companyName)
+                                .font(.subheadline.weight(.semibold))
+
+                            Text(application.positionTitle)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            Label(nextActionTitle, systemImage: "arrow.forward.circle")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+
+                            if let followUpAt = application.followUpAt {
+                                Text("Follow-up am \(followUpAt, style: .date)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            if summary.dueCount > 0 {
+                                Text(
+                                    summary.dueCount == 1
+                                        ? "1 Follow-up ist fällig"
+                                        : "\(summary.dueCount) Follow-ups sind fällig"
+                                )
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.orange)
+                            }
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(14)
+                    .background(.thinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("dashboard.application-follow-up")
+            }
         }
     }
 }

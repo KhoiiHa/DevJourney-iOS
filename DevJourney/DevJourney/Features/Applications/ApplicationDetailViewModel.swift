@@ -16,11 +16,17 @@ final class ApplicationDetailViewModel {
     var status: String
     var hasAppliedDate: Bool
     var appliedAt: Date
+    var nextAction: String
+    var hasFollowUpDate: Bool
+    var followUpAt: Date
 
     let availableStatuses = JobApplicationStatus.all
 
     var canSave: Bool {
-        !trimmedCompanyName.isEmpty && !trimmedPositionTitle.isEmpty && hasValidJobURL
+        !trimmedCompanyName.isEmpty &&
+            !trimmedPositionTitle.isEmpty &&
+            hasValidJobURL &&
+            hasValidFollowUp
     }
 
     var validationMessage: String? {
@@ -40,7 +46,11 @@ final class ApplicationDetailViewModel {
             return "Position ist ein Pflichtfeld."
         }
 
-        return hasValidJobURL ? nil : "Bitte gib einen gültigen Stellenanzeigen-Link ein."
+        if !hasValidJobURL {
+            return "Bitte gib einen gültigen Stellenanzeigen-Link ein."
+        }
+
+        return hasValidFollowUp ? nil : "Ergänze eine nächste Aktion für das Follow-up-Datum."
     }
 
     var validJobURL: URL? {
@@ -54,6 +64,9 @@ final class ApplicationDetailViewModel {
         status = application.status
         hasAppliedDate = application.appliedAt != nil
         appliedAt = application.appliedAt ?? Date()
+        nextAction = application.nextAction
+        hasFollowUpDate = application.followUpAt != nil
+        followUpAt = application.followUpAt ?? Date()
     }
 
     func save(to application: JobApplication) {
@@ -66,6 +79,8 @@ final class ApplicationDetailViewModel {
         application.jobURL = trimmedJobURL
         application.status = status
         application.appliedAt = hasAppliedDate ? appliedAt : nil
+        application.nextAction = trimmedNextAction
+        application.followUpAt = hasFollowUpDate ? followUpAt : nil
     }
 
     private var trimmedCompanyName: String {
@@ -80,7 +95,15 @@ final class ApplicationDetailViewModel {
         jobURL.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    private var trimmedNextAction: String {
+        nextAction.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
     private var hasValidJobURL: Bool {
         trimmedJobURL.isEmpty || validJobURL != nil
+    }
+
+    private var hasValidFollowUp: Bool {
+        !hasFollowUpDate || !trimmedNextAction.isEmpty
     }
 }

@@ -4,6 +4,8 @@ DevJourney is a personal career and portfolio cockpit for junior developers. The
 
 Version 0.2 adds project milestones and a compact portfolio-readiness workflow without expanding the deliberately lightweight architecture.
 
+The current `main` branch additionally supports a next action and optional follow-up date for job applications. The dashboard selects the earliest dated open action, then falls back to undated actions, so the next application task stays visible without reminders or background services.
+
 ## Screenshots
 
 | Portfolio focus | Project readiness |
@@ -20,6 +22,8 @@ Version 0.2 adds project milestones and a compact portfolio-readiness workflow w
 - Filter projects by open attention and portfolio readiness alongside search
 - Identify portfolio-ready projects and the project with the most open work on the dashboard
 - Track job applications by company, position, status, and optional application date
+- Plan the next application action with an optional follow-up date
+- See the most urgent open application action and due count on the dashboard
 - Review key metrics and application status distribution with Swift Charts
 - Persist all app data locally with SwiftData
 
@@ -68,7 +72,7 @@ No service or repository layer is used because all data remains local and the cu
 
 ## SwiftData Migrations
 
-DevJourney 0.2 defines the persisted baseline as `DevJourneySchemaV1` with schema version `1.0.0`. Every app container, including the in-memory UI-test container, uses `DevJourneyMigrationPlan`.
+DevJourney 0.2 defines the persisted baseline as `DevJourneySchemaV1` with schema version `1.0.0`. The current app schema is `DevJourneySchemaV2` with version `2.0.0`; it adds application next-action and follow-up fields through a lightweight migration. Every app container, including the in-memory UI-test container, uses `DevJourneyMigrationPlan`.
 
 For future persisted model changes:
 
@@ -92,6 +96,7 @@ The unit suite covers validation and persistence behavior across goals, projects
 - opening existing unversioned stores with the versioned schema and migration plan
 
 UI tests cover creating a learning goal, dashboard navigation, launch behavior, and the complete project milestone and readiness workflow.
+They also cover creating an application action, showing it in the application list, and surfacing it on the dashboard.
 
 Run the unit suite with:
 
