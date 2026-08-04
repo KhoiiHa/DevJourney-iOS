@@ -1,16 +1,14 @@
-# DevJourney 0.2
+# DevJourney 0.3
 
 DevJourney is a personal career and portfolio cockpit for junior developers. The SwiftUI app combines learning goals, portfolio projects, and job applications with a clear view of what deserves attention next.
 
-Version 0.2 adds project milestones and a compact portfolio-readiness workflow without expanding the deliberately lightweight architecture.
-
-The current `main` branch additionally supports a next action and optional follow-up date for job applications. The dashboard selects the earliest dated open action, then falls back to undated actions, so the next application task stays visible without reminders or background services.
+Version 0.3 adds a next action and optional follow-up date for job applications. The dashboard selects the earliest dated open action, then falls back to undated actions, so the next application task stays visible without reminders or background services. This builds on the project milestones and portfolio-readiness workflow introduced in version 0.2 without expanding the deliberately lightweight architecture.
 
 ## Screenshots
 
-| Portfolio focus | Project readiness |
-| --- | --- |
-| ![Dashboard showing portfolio focus](docs/screenshots/dashboard-portfolio-focus.png) | ![Project milestones and readiness checklist](docs/screenshots/project-readiness.png) |
+| Portfolio focus | Project readiness | Application focus |
+| --- | --- | --- |
+| ![Dashboard showing portfolio focus](docs/screenshots/dashboard-portfolio-focus.png) | ![Project milestones and readiness checklist](docs/screenshots/project-readiness.png) | ![Dashboard showing the next application action](docs/screenshots/dashboard-application-focus.png) |
 
 ## Features
 
@@ -72,7 +70,7 @@ No service or repository layer is used because all data remains local and the cu
 
 ## SwiftData Migrations
 
-DevJourney 0.2 defines the persisted baseline as `DevJourneySchemaV1` with schema version `1.0.0`. The current app schema is `DevJourneySchemaV2` with version `2.0.0`; it adds application next-action and follow-up fields through a lightweight migration. Every app container, including the in-memory UI-test container, uses `DevJourneyMigrationPlan`.
+DevJourney 0.2 defines the persisted baseline as `DevJourneySchemaV1` with schema version `1.0.0`. Version 0.3 uses `DevJourneySchemaV2` with version `2.0.0`; it adds application next-action and follow-up fields through a lightweight migration. Every app container, including the in-memory UI-test container, uses `DevJourneyMigrationPlan`.
 
 For future persisted model changes:
 
@@ -86,14 +84,15 @@ The `--reset-store` launch argument remains an explicit DEBUG-only development t
 
 ## Tests
 
-The unit suite covers validation and persistence behavior across goals, projects, applications, and the dashboard. Version 0.2 specifically verifies:
+The unit suite covers validation and persistence behavior across goals, projects, applications, and the dashboard. Versions 0.2 and 0.3 specifically verify:
 
 - readiness progress and complete portfolio-ready projects
 - deterministic next-step selection
 - completed projects and projects without milestones
 - milestone creation, editing, and persistence
 - dashboard readiness counts and attention prioritization
-- opening existing unversioned stores with the versioned schema and migration plan
+- follow-up validation, due-state calculation, and deterministic dashboard prioritization
+- migration of unversioned and versioned V1 stores to V2 without data loss
 
 UI tests cover creating a learning goal, dashboard navigation, launch behavior, and the complete project milestone and readiness workflow.
 They also cover creating an application action, showing it in the application list, and surfacing it on the dashboard.
@@ -111,6 +110,6 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild \
 
 ## Scope
 
-DevJourney 0.2 is intentionally local and single-user. Cloud sync, authentication, AI prioritization, reminders, and exports remain out of scope.
+DevJourney 0.3 is intentionally local and single-user. Cloud sync, authentication, AI prioritization, reminders, and exports remain out of scope.
 
 Possible next iterations are broader accessibility regression coverage and release automation.
